@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Windows 12 - Web OS Experience</title>
     <style>
+        html { background-color: #000; } /* Prevents white borders during screen glitching */
+
         /* ==========================================================================
            CORE DESIGN SYSTEM & VARIABLES
            ========================================================================== */
@@ -34,6 +36,93 @@
             --hover-bg: rgba(0, 0, 0, 0.06);
             --active-bg: rgba(0, 0, 0, 0.1);
             --input-bg: rgba(255, 255, 255, 0.8);
+            --bg-wallpaper: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2564&auto=format&fit=crop');
+        }
+
+        /* ==========================================================================
+           ULTIMATE GAMING THEME OVERRIDES (ASUS ROG STYLE)
+           ========================================================================== */
+        [data-theme="gaming"] {
+            --accent: #ff0033; /* Aggressive ROG Neon Red */
+            --glass-bg: rgba(10, 5, 5, 0.95);
+            --glass-border: #ff0033;
+            --win-bg: #0a0505;
+            --text-main: #ffffff;
+            --text-secondary: #ff0033;
+            --hover-bg: rgba(255, 0, 51, 0.25);
+            --active-bg: rgba(255, 0, 51, 0.5);
+            --input-bg: rgba(20, 0, 5, 0.8);
+            --radius-md: 0px;
+            --radius-lg: 0px;
+            --shadow-lg: 0 0 30px rgba(255, 0, 51, 0.4);
+            --bg-wallpaper: 
+                repeating-linear-gradient( -45deg, rgba(255, 0, 51, 0.25), rgba(255, 0, 51, 0.25) 2px, transparent 2px, transparent 40px ),
+                repeating-linear-gradient( 45deg, rgba(255, 0, 51, 0.1), rgba(255, 0, 51, 0.1) 2px, transparent 2px, transparent 60px ),
+                linear-gradient( 135deg, #050000 0%, #150005 30%, #660011 50%, #150005 70%, #050000 100% );
+        }
+
+        /* Typography & Aggressive Styling */
+        [data-theme="gaming"] * { font-family: 'Trebuchet MS', 'Impact', sans-serif !important; letter-spacing: 0.5px; }
+        
+        /* Slash-Cut Geometry for Windows */
+        [data-theme="gaming"] .sys-window { 
+            border: none;
+            background: linear-gradient(135deg, rgba(255,0,51,1) 0%, rgba(255,0,51,0) 2px, var(--win-bg) 2px);
+            box-shadow: inset 0 0 20px rgba(255, 0, 51, 0.3);
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+            border-bottom: 3px solid var(--accent);
+            border-right: 3px solid var(--accent);
+        }
+        
+        /* Cyber Titlebars */
+        [data-theme="gaming"] .win-titlebar {
+            background: linear-gradient(90deg, #8a0018 0%, #1a0005 100%);
+            border-bottom: 2px solid var(--accent);
+            text-transform: uppercase;
+            font-style: italic;
+            font-weight: 900;
+        }
+
+        /* Slash-Cut Buttons & Menus */
+        [data-theme="gaming"] .mica { 
+            background: rgba(15, 0, 5, 0.95);
+            border: none;
+            border-top: 2px solid var(--accent);
+            border-left: 2px solid var(--accent);
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            backdrop-filter: none; 
+            -webkit-backdrop-filter: none; 
+        }
+        
+        /* Full width Taskbar override for gaming mode */
+        [data-theme="gaming"] #taskbar {
+            clip-path: none;
+            border: none;
+            border-top: 2px solid var(--accent);
+        }
+
+        /* Neon Glowing Icons */
+        [data-theme="gaming"] .tb-btn.running::after { box-shadow: 0 -2px 15px var(--accent); height: 4px; background: var(--accent); }
+        [data-theme="gaming"] .desktop-icon span { filter: drop-shadow(0 0 12px var(--accent)); }
+        [data-theme="gaming"] .desktop-icon p { font-style: italic; text-transform: uppercase; font-weight: bold; background: rgba(0,0,0,0.5); padding: 2px 5px; }
+        
+        /* Angular Inputs and Accents */
+        [data-theme="gaming"] input, [data-theme="gaming"] button {
+            border-radius: 0 !important;
+        }
+        [data-theme="gaming"] button {
+            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+            border: 1px solid var(--accent) !important;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+        [data-theme="gaming"] .calc-btn { clip-path: none; border: 1px solid rgba(255,0,51,0.2) !important; }
+
+        /* Animated Wallpaper Keyframes */
+        @keyframes aggressiveScan {
+            0% { background-position: 0 0, 0 0, 0% 50%; }
+            50% { background-position: -60px 60px, 90px 90px, 100% 50%; }
+            100% { background-position: -120px 120px, 180px 180px, 0% 50%; }
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; user-select: none; }
@@ -43,6 +132,11 @@
             background: var(--bg-wallpaper) center/cover no-repeat;
             color: var(--text-main); font-size: 14px;
             transition: transform 1s ease-in-out; /* For easter eggs */
+        }
+
+        [data-theme="gaming"] body {
+            background-size: 120px 120px, 180px 180px, 400% 400%;
+            animation: aggressiveScan 8s linear infinite;
         }
 
         .mica { background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); box-shadow: var(--shadow-lg); }
@@ -74,7 +168,7 @@
         /* ==========================================================================
            DESKTOP & WINDOW MANAGER
            ========================================================================== */
-        #desktop { position: absolute; top: 0; left: 0; right: 0; bottom: 55px; padding: 10px; display: grid; grid-template-columns: repeat(auto-fill, 84px); grid-template-rows: repeat(auto-fill, 96px); grid-auto-flow: column; gap: 4px; z-index: 10; }
+        #desktop { position: absolute; top: 0; left: 0; right: 0; bottom: 48px; padding: 10px; display: grid; grid-template-columns: repeat(auto-fill, 84px); grid-template-rows: repeat(auto-fill, 96px); grid-auto-flow: column; gap: 4px; z-index: 10; }
         .desktop-icon { width: 84px; height: 96px; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; padding: 8px 4px; cursor: default; transition: background 0.15s; border: 1px solid transparent; }
         .desktop-icon:hover { background: var(--hover-bg); }
         .desktop-icon.selected { background: var(--active-bg); border-color: var(--glass-border); }
@@ -85,7 +179,7 @@
         .sys-window { position: absolute; border-radius: var(--radius-lg); display: flex; flex-direction: column; overflow: hidden; background: var(--win-bg); border: 1px solid var(--glass-border); box-shadow: var(--shadow-lg); pointer-events: auto; transform: scale(0.95); opacity: 0; transition: transform 0.2s, opacity 0.2s; }
         .sys-window.active-anim { transform: scale(1); opacity: 1; }
         .sys-window.active-focus { box-shadow: 0 24px 64px rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.2); }
-        .sys-window.maximized { top: 0 !important; left: 0 !important; width: 100vw !important; height: calc(100vh - 50px) !important; border-radius: 0; border: none; }
+        .sys-window.maximized { top: 0 !important; left: 0 !important; width: 100vw !important; height: calc(100vh - 48px) !important; border-radius: 0; border: none; }
         
         .win-titlebar { height: 40px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.1); padding-left: 12px; cursor: default; transition: background 0.2s; }
         .sys-window.active-focus .win-titlebar { background: transparent; }
@@ -99,15 +193,15 @@
         /* ==========================================================================
            TASKBAR & START MENU
            ========================================================================== */
-        #taskbar-wrapper { position: absolute; bottom: 6px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 9000; pointer-events: none; }
-        #taskbar { height: 48px; border-radius: 24px; padding: 0 20px; display: flex; align-items: center; justify-content: center; gap: 4px; pointer-events: auto; min-width: 400px; transition: all 0.3s ease; }
+        #taskbar-wrapper { position: absolute; bottom: 0; left: 0; width: 100%; height: 48px; display: flex; justify-content: center; z-index: 9000; pointer-events: none; }
+        #taskbar { width: 100%; height: 100%; border-radius: 0; border-left: none; border-right: none; border-bottom: none; padding: 0 20px; display: flex; align-items: center; justify-content: center; gap: 4px; pointer-events: auto; transition: all 0.3s ease; }
         .tb-btn { width: 40px; height: 40px; border-radius: var(--radius-md); border: none; background: transparent; color: var(--text-main); font-size: 20px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; position: relative; }
         .tb-btn:hover { background: var(--hover-bg); transform: translateY(-1px); }
         .tb-btn.running::after { content: ''; position: absolute; bottom: 2px; width: 6px; height: 3px; border-radius: 3px; background: var(--text-secondary); transition: all 0.2s; }
         .tb-btn.active-focus { background: var(--active-bg); }
         .tb-btn.active-focus::after { width: 16px; background: var(--accent); }
         
-        #sys-tray { position: absolute; right: 10px; bottom: 6px; height: 48px; display: flex; align-items: center; z-index: 9000; pointer-events: auto; gap: 5px;}
+        #sys-tray { position: absolute; right: 10px; top: 0; height: 100%; display: flex; align-items: center; z-index: 9000; pointer-events: auto; gap: 5px; }
         .tray-item { padding: 0 12px; height: 36px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s; color: var(--text-main); font-size: 14px;}
         .tray-item:hover { background: var(--hover-bg); }
         .tray-clock { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
@@ -188,6 +282,98 @@
         @keyframes menuOpen { from { opacity: 0; transform: scale(0.95) translateY(-5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         #context-menu { animation: menuOpen 0.2s cubic-bezier(0.1, 0.9, 0.2, 1); transform-origin: top left; }
 
+        /* Barrel Roll Animation */
+        @keyframes barrelRollAnim { 0% { transform: rotate(0deg) scale(1); } 100% { transform: rotate(360deg) scale(1); } }
+        .barrel-roll { animation: barrelRollAnim 1s ease-in-out !important; }
+
+        /* Enhanced Transformer Glitch Animation */
+        @keyframes cyberGlitch {
+            0% { transform: scale(1) translate(0, 0) skew(0deg); filter: contrast(1); clip-path: inset(0 0 0 0); }
+            5% { transform: scale(1.02) translate(5px, -5px) skew(2deg); filter: contrast(1.2) saturate(1.5); clip-path: inset(10% 0 20% 0); }
+            10% { transform: scale(1.05) translate(-10px, 5px) skew(-3deg); filter: contrast(1.5) saturate(2) invert(0.2); clip-path: inset(0 20% 0 10%); }
+            15% { transform: scale(1) translate(0, 0) skew(0deg); clip-path: inset(0 0 0 0); }
+            30% { transform: scale(1.03) translate(8px, 2px) skew(1deg); filter: contrast(2) hue-rotate(45deg); clip-path: inset(30% 0 40% 0); }
+            40% { transform: scale(1.1) translate(-5px, -5px) skew(-2deg); filter: contrast(3) invert(1) hue-rotate(180deg); clip-path: inset(15% 0 10% 0); }
+            45% { transform: scale(1.15) translate(15px, 10px) skew(5deg); filter: invert(1) sepia(1) saturate(5) hue-rotate(-50deg); clip-path: inset(0 0 0 0); }
+            50% { transform: scale(1.2) translate(-15px, -10px) skew(-5deg); filter: invert(1) sepia(1) saturate(10) hue-rotate(-50deg); clip-path: inset(10% 0 10% 0); } /* Peak Red Glitch - Theme Swaps Here */
+            55% { transform: scale(1.1) translate(5px, 5px) skew(2deg); filter: contrast(2) saturate(3) hue-rotate(360deg); clip-path: inset(20% 0 30% 0); }
+            60% { transform: scale(1.05) translate(-5px, -2px) skew(-1deg); filter: contrast(1.5) saturate(2); clip-path: inset(5% 0 15% 0); }
+            70% { transform: scale(1.02) translate(2px, 2px) skew(0deg); filter: contrast(1.2) saturate(1.2); clip-path: inset(0 0 0 0); }
+            80% { transform: scale(1.01) translate(-2px, -1px); filter: contrast(1.1); clip-path: inset(2% 0 2% 0); }
+            100% { transform: scale(1) translate(0, 0) skew(0deg); filter: contrast(1); clip-path: inset(0 0 0 0); }
+        }
+        .transform-anim { animation: cyberGlitch 2.5s cubic-bezier(.25, .46, .45, .94) both; pointer-events: none; }
+
+        @keyframes screenFlash {
+            0% { opacity: 0; background: transparent; mix-blend-mode: normal; }
+            40% { opacity: 0.8; background: #ffffff; mix-blend-mode: overlay; }
+            50% { opacity: 1; background: #ff0033; mix-blend-mode: color-dodge; } /* Explodes with ROG Red */
+            60% { opacity: 0.8; background: #ffffff; mix-blend-mode: overlay; }
+            100% { opacity: 0; background: transparent; mix-blend-mode: normal; }
+        }
+        #glitch-overlay {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999999;
+            pointer-events: none; display: none;
+        }
+        #glitch-overlay.flash-anim { display: block; animation: screenFlash 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+
+        /* Easter Egg: Bullet Holes & BSOD */
+        .bullet-hole {
+            position: fixed; width: 40px; height: 40px; transform: translate(-50%, -50%);
+            background: radial-gradient(circle, #000 10%, #222 30%, transparent 60%);
+            z-index: 999999; pointer-events: none;
+        }
+        .bullet-crack {
+            position: absolute; top: 50%; left: 50%; width: 60px; height: 2px; background: rgba(255,255,255,0.4);
+            transform-origin: left center; pointer-events: none; box-shadow: 0 0 2px rgba(255,255,255,0.8);
+        }
+        #fake-bsod {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0078d7; color: white;
+            font-family: 'Segoe UI', sans-serif; padding: 100px; box-sizing: border-box; z-index: 9999999;
+            display: none; cursor: none;
+        }
+
+        /* Easter Egg: Tactical Nuke & Credits */
+        #nuke-countdown {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(20, 0, 0, 0.85); backdrop-filter: blur(10px);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 99999999; color: #ff3300; font-family: 'Impact', 'Trebuchet MS', sans-serif; text-transform: uppercase;
+        }
+        .nuke-text { font-size: 60px; text-shadow: 0 0 20px #ff3300; text-align: center; letter-spacing: 2px;}
+        .nuke-timer { font-size: 150px; text-shadow: 0 0 40px #ff3300; margin-top: 20px; }
+
+        @keyframes nukeWhiteout {
+            0% { opacity: 0; background: #fff; }
+            10% { opacity: 1; background: #fff; }
+            50% { opacity: 1; background: #fff; }
+            100% { opacity: 1; background: #ff3300; }
+        }
+        .nuke-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 99999999; pointer-events: none;
+            animation: nukeWhiteout 1s ease-out forwards;
+        }
+        @keyframes sirenRed {
+            0%, 100% { box-shadow: inset 0 0 0px transparent; }
+            50% { box-shadow: inset 0 0 200px rgba(255,0,0,0.8); }
+        }
+        .siren-active { animation: sirenRed 1s infinite; }
+
+        /* Easter Egg: Fake Cursor */
+        #fake-cursor {
+            position: fixed; width: 24px; height: 24px; z-index: 999999999; pointer-events: none; display: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="1.5"><path d="M4 2l11 11h-5l4 8-2.5 1.5-4-8-4 4z"/></svg>');
+            background-size: contain; background-repeat: no-repeat;
+            transition: top 1.2s ease-in-out, left 1.2s ease-in-out, transform 0.1s;
+        }
+
+        #credits-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; color: white;
+            z-index: 999999999; display: none; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 2s ease-in-out;
+        }
+
         /* Calendar Flyout */
         #calendar-flyout { position: absolute; bottom: 60px; right: 10px; width: 320px; border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 15px; z-index: 9999; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.95); transition: all 0.25s cubic-bezier(0.1,0.9,0.2,1); }
         #calendar-flyout.visible { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
@@ -207,6 +393,34 @@
     </style>
 </head>
 <body>
+
+    <!-- Glitch Overlay -->
+    <div id="glitch-overlay"></div>
+
+    <!-- Fake BSOD Easter Egg -->
+    <div id="fake-bsod">
+        <h1 style="font-size: 120px; margin-bottom: 20px; font-weight: normal;">:(</h1>
+        <h2 style="font-size: 30px; font-weight: normal; margin-bottom: 40px;">Your PC ran into a problem because you clicked THE BUTTON.</h2>
+        <p style="font-size: 20px;">TREASURE HUNT COMPLETE! 🏆</p>
+        <p style="font-size: 20px; margin-top: 40px; color: #a6d8ff;">100% complete</p>
+        <p style="font-size: 16px; margin-top: 20px;">System will automatically restart in a few seconds...</p>
+    </div>
+
+    <!-- Nuke Countdown Overlay -->
+    <div id="nuke-countdown">
+        <div class="nuke-text">AUTHORIZATION ACCEPTED</div>
+        <div class="nuke-text" style="font-size:40px; margin-top:10px;">LAUNCHING NUCLEAR WEAPON IN</div>
+        <div class="nuke-timer" id="nuke-timer-val">3</div>
+    </div>
+
+    <!-- Credits Screen -->
+    <div id="credits-screen">
+        <canvas id="credits-stars" style="position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
+        <h1 style="position:relative; z-index:10; font-family:'Segoe UI', sans-serif; font-weight:300; letter-spacing:8px; font-size:48px; text-shadow: 0 0 20px rgba(255,255,255,0.5);">Made by Deepmalya</h1>
+    </div>
+
+    <!-- Ghost Cursor for Cutscene -->
+    <div id="fake-cursor"></div>
 
     <!-- Matrix Easter Egg Background -->
     <canvas id="matrix-bg"></canvas>
@@ -242,7 +456,10 @@
                 <div id="sm-avatar" style="width:32px; height:32px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:bold;">G</div>
                 <span id="sm-username">Guest User</span>
             </div>
-            <div class="sm-power" title="Shut down" onclick="System.shutdown()">⏻</div>
+            <div style="display:flex; gap: 5px;">
+                <div class="sm-power" title="Restart" onclick="System.restart()">↻</div>
+                <div class="sm-power" title="Shut down" onclick="System.shutdown()">⏻</div>
+            </div>
         </div>
     </div>
 
@@ -336,7 +553,7 @@
             }
         };
 
-        const PinnedApps = ['copilot', 'explorer', 'terminal', 'calc'];
+        const PinnedApps = ['copilot', 'browser', 'explorer', 'terminal', 'calc'];
 
         // --- 1. VIRTUAL FILE SYSTEM ---
         window.Clipboard = null; // Global clipboard for Cut/Copy/Paste
@@ -376,7 +593,8 @@
             'C:': [
                 { name: 'Desktop', icon: '🖥️', type: 'dir', target: 'C:/Desktop' },
                 { name: 'Documents', icon: '📄', type: 'dir', target: 'C:/Documents' },
-                { name: 'Downloads', icon: '⬇️', type: 'dir', target: 'C:/Downloads' }
+                { name: 'Downloads', icon: '⬇️', type: 'dir', target: 'C:/Downloads' },
+                { name: 'THE_BUTTON.bat', icon: '💣', type: 'app', target: 'bsod' }
             ],
             'D:': [
                 { name: 'Games', icon: '📁', type: 'dir', target: 'D:/Games' },
@@ -386,25 +604,664 @@
                 { name: 'System Image.iso', icon: '💿', type: 'file', content: 'Encrypted System Backup.' }
             ],
             'D:/Games': [],
-            'D:/Work Backups': [],
+            'D:/Work Backups': [
+                { name: 'CONFIDENTIAL.txt', icon: '🔒', type: 'file', isLocked: true, password: 'ROSEBUD', content: 'You shouldn\'t have done that...' }
+            ],
             'C:/Desktop': [
                 { name: 'Copilot', icon: '✨', type: 'app', target: 'copilot' },
+                { name: 'Web Browser', icon: '🌍', type: 'app', target: 'browser' },
                 { name: 'This PC', icon: '🖥️', type: 'app', target: 'explorer' },
                 { name: 'Terminal', icon: '>_', type: 'app', target: 'terminal' },
                 { name: 'Calculator', icon: '🧮', type: 'app', target: 'calc' },
                 { name: 'Snake Game', icon: '🐍', type: 'app', target: 'snake' },
                 { name: 'Flappy Bird', icon: '🐦', type: 'app', target: 'flappybird' },
                 { name: 'Notes.txt', icon: '📄', type: 'file', content: 'Welcome to the Web OS!\n\nTry exploring the apps, or try to find some of the hidden Easter Eggs.' },
-                { name: 'DO_NOT_READ.txt', icon: '🔒', type: 'file', content: 'I TOLD YOU NOT TO READ THIS.\n\nNow you must enter the Konami code on your keyboard to save yourself.\n(Up, Up, Down, Down, Left, Right, Left, Right, B, A)' }
+                { name: 'DO_NOT_READ.txt', icon: '🔒', type: 'file', content: 'I TOLD YOU NOT TO READ THIS.\n\nNow you must go on a quest.\n\nLook inside your "Downloads" folder for a file called TOP_SECRET.txt.\n\nDo NOT open it. I am warning you.' }
             ],
             'C:/Documents': [
-                { name: 'Secret.txt', icon: '📄', type: 'file', content: 'You found the secret document directory! 🏆' }
+                { name: 'Secret.txt', icon: '📄', type: 'file', content: 'You found the secret document directory! 🏆\n\nBy the way, if you are looking for the admin password to unlock CONFIDENTIAL.txt in the D: drive, it is:\n\nROSEBUD' }
             ],
-            'C:/Downloads': []
+            'C:/Downloads': [
+                { name: 'TOP_SECRET.txt', icon: '🤫', type: 'file', content: 'Oh no. You opened it.\n\nTAKE COVER!!!\n\n...\n\nIf you survived that, there is one last secret. Go to the root C: drive. Find the bomb.' }
+            ]
         };
 
         // --- 2. APP REGISTRY ---
         const Apps = {
+            'bsod': {
+                name: 'System Crash', icon: '💥', width: 0, height: 0,
+                render: () => '',
+                init: (id) => {
+                    WindowManager.close(id); // Instantly close the window
+                    EasterEggs.fakeBSOD(); // Trigger the effect
+                }
+            },
+            'browser': {
+                name: 'Web Browser', icon: '🌍', width: 850, height: 550,
+                render: (id) => `
+                    <div class="app-browser" style="display:flex; flex-direction:column; height:100%; background:#fff; color:#000;">
+                        <div style="display:flex; padding:10px; background:#f1f1f1; border-bottom:1px solid #ccc; gap:10px; align-items:center;">
+                            <button style="border:none; background:transparent; font-size:18px; cursor:pointer; color:#333;" onclick="document.getElementById('${id}-url').value='os://home'; document.getElementById('${id}-go').click();" title="Home">🏠</button>
+                            <input type="text" id="${id}-url" value="os://home" style="flex:1; padding:8px 16px; border-radius:20px; border:1px solid #ccc; outline:none; font-size:14px; background:#fff; color:#000;" spellcheck="false" placeholder="Search the web or enter URL...">
+                            <button id="${id}-go" style="border:none; background:var(--accent); color:white; padding:8px 16px; border-radius:20px; cursor:pointer; font-weight:bold;">Go</button>
+                        </div>
+                        <div style="flex:1; position:relative; overflow:hidden; background:#fff;" id="${id}-content">
+                            <iframe id="${id}-frame" src="about:blank" style="width:100%; height:100%; border:none; display:none;"></iframe>
+                            <div id="${id}-custom-page" style="width:100%; height:100%; overflow-y:auto; padding:30px; box-sizing:border-box;"></div>
+                        </div>
+                    </div>
+                `,
+                init: (id, state) => {
+                    const urlInput = document.getElementById(`${id}-url`);
+                    const goBtn = document.getElementById(`${id}-go`);
+                    const frame = document.getElementById(`${id}-frame`);
+                    const customPage = document.getElementById(`${id}-custom-page`);
+                    const winEl = document.getElementById(id); 
+
+                    const showCustom = (html) => {
+                        frame.style.display = 'none';
+                        customPage.style.display = 'block';
+                        customPage.innerHTML = html;
+                    };
+
+                    const showFrame = (url) => {
+                        customPage.style.display = 'none';
+                        frame.style.display = 'block';
+                        frame.src = url;
+                    };
+
+                    // --- EASTER EGG CUTSCENE OVERRIDE ---
+                    if (state && state.isNukeCutscene) {
+                        urlInput.value = "LIVE: GLOBAL NEWS NETWORK";
+                        urlInput.disabled = true;
+                        goBtn.disabled = true;
+                        
+                        customPage.innerHTML = `<canvas id="${id}-nuke-canvas" style="width:100%; height:100%; display:block; background:#000;"></canvas>`;
+                        frame.style.display = 'none'; 
+                        customPage.style.display = 'block';
+                        
+                        const cvs = document.getElementById(`${id}-nuke-canvas`);
+                        const ctx = cvs.getContext('2d');
+                        
+                        // Setup Space Assets
+                        const stars = [];
+                        for(let i=0; i<300; i++) stars.push({x: Math.random(), y: Math.random(), s: Math.random()*2.0});
+                        
+                        // Setup Panic People
+                        const panicPeople = [];
+                        for(let i=0; i<40; i++) {
+                            panicPeople.push({
+                                x: Math.random() * 2000,
+                                y: 80 + Math.random() * 60,
+                                speed: (Math.random() * 4 + 4) * (Math.random() > 0.5 ? 1 : -1),
+                                color: `hsl(${Math.random()*360}, 40%, 15%)`,
+                                size: Math.random() * 0.4 + 0.6
+                            });
+                        }
+
+                        let debris = [];
+                        function initDebris(cx, cy) {
+                            for(let i=0; i<90; i++) {
+                                debris.push({
+                                    x: cx, y: cy, 
+                                    vx: (Math.random()-0.5)*25, 
+                                    vy: (Math.random()-0.5)*25,
+                                    size: Math.random()*20 + 5, 
+                                    scale: 1, 
+                                    scaleSpeed: Math.random()*0.12 + 0.02,
+                                    rot: Math.random()*Math.PI*2, 
+                                    rotV: (Math.random()-0.5)*0.3
+                                });
+                            }
+                            // Massive Explosion Audio
+                            try {
+                                const actx = new (window.AudioContext || window.webkitAudioContext)();
+                                const osc = actx.createOscillator(); 
+                                const gain = actx.createGain();
+                                osc.type = 'sawtooth'; 
+                                osc.frequency.setValueAtTime(80, actx.currentTime);
+                                osc.frequency.exponentialRampToValueAtTime(1, actx.currentTime + 6.0);
+                                gain.gain.setValueAtTime(4, actx.currentTime); 
+                                gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 6.0);
+                                osc.connect(gain); gain.connect(actx.destination);
+                                osc.start(); osc.stop(actx.currentTime + 6.0);
+
+                                // High pitch shatter
+                                const bufferSize = actx.sampleRate * 2;
+                                const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
+                                const data = buffer.getChannelData(0);
+                                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                                const noise = actx.createBufferSource(); noise.buffer = buffer;
+                                const nFilter = actx.createBiquadFilter(); nFilter.type = 'highpass'; nFilter.frequency.value = 1000;
+                                const nGain = actx.createGain(); nGain.gain.setValueAtTime(2, actx.currentTime); nGain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 2.0);
+                                noise.connect(nFilter); nFilter.connect(nGain); nGain.connect(actx.destination);
+                                noise.start();
+                            } catch(e){}
+                        }
+
+                        let startTime = Date.now();
+                        let impacted = false;
+                        let flashAlpha = 0;
+                        let spaceAudioPlayed = false;
+                        window.bsodTriggered = false;
+
+                        // Start Intro Audio
+                        try {
+                            const actx = new (window.AudioContext || window.webkitAudioContext)();
+                            // Crowd Noise
+                            const bufferSize = actx.sampleRate * 2;
+                            const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
+                            const data = buffer.getChannelData(0);
+                            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                            const noise = actx.createBufferSource(); noise.buffer = buffer; noise.loop = true;
+                            const filter = actx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 400;
+                            const gain = actx.createGain(); gain.gain.setValueAtTime(0.6, actx.currentTime); gain.gain.linearRampToValueAtTime(0, actx.currentTime + 10.0);
+                            noise.connect(filter); filter.connect(gain); gain.connect(actx.destination);
+                            noise.start(); noise.stop(actx.currentTime + 10.0);
+                            
+                            // Rocket Rumble
+                            const osc = actx.createOscillator(); const rGain = actx.createGain();
+                            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(80, actx.currentTime); osc.frequency.linearRampToValueAtTime(30, actx.currentTime + 10.0);
+                            rGain.gain.setValueAtTime(0.8, actx.currentTime); rGain.gain.linearRampToValueAtTime(0, actx.currentTime + 10.0);
+                            osc.connect(rGain); rGain.connect(actx.destination);
+                            osc.start(); osc.stop(actx.currentTime + 10.0);
+                        } catch(e){}
+
+                        // Drawing Helpers
+                        function drawEarth(ctx, cx, cy, r, t) {
+                            ctx.save(); 
+                            // Atmosphere glow
+                            const atmo = ctx.createRadialGradient(cx, cy, r*0.8, cx, cy, r*1.3);
+                            atmo.addColorStop(0, 'rgba(74, 163, 223, 0.8)');
+                            atmo.addColorStop(1, 'rgba(74, 163, 223, 0)');
+                            ctx.fillStyle = atmo;
+                            ctx.beginPath(); ctx.arc(cx, cy, r*1.3, 0, Math.PI*2); ctx.fill();
+
+                            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.clip();
+                            // Ocean 3D
+                            const ocean = ctx.createRadialGradient(cx-r*0.3, cy-r*0.3, r*0.1, cx, cy, r);
+                            ocean.addColorStop(0, '#4aa3df'); ocean.addColorStop(1, '#001a4d');
+                            ctx.fillStyle = ocean; ctx.fill();
+                            // Continents
+                            ctx.fillStyle = '#1e824c';
+                            ctx.beginPath(); ctx.arc(cx - r*0.2, cy - r*0.2, r*0.6, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(cx + r*0.4, cy + r*0.3, r*0.5, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.ellipse(cx - r*0.5, cy + r*0.5, r*0.6, r*0.2, -Math.PI/4, 0, Math.PI*2); ctx.fill();
+                            // Earth Clouds
+                            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                            let cloudOffset = (t * 0.005) % (r*2);
+                            ctx.beginPath(); ctx.arc(cx - r + cloudOffset, cy + r*0.1, r*0.3, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(cx + r*0.3 - cloudOffset*0.5, cy - r*0.4, r*0.4, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(cx - r*0.6 + cloudOffset, cy - r*0.1, r*0.2, 0, Math.PI*2); ctx.fill();
+                            // Shadow Terminator
+                            const shadow = ctx.createLinearGradient(cx-r, cy-r, cx+r, cy+r);
+                            shadow.addColorStop(0, 'rgba(0,0,0,0)');
+                            shadow.addColorStop(0.5, 'rgba(0,0,0,0.4)');
+                            shadow.addColorStop(1, 'rgba(0,0,0,0.95)');
+                            ctx.fillStyle = shadow;
+                            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+                            ctx.restore();
+                        }
+
+                        function drawMoon(ctx, cx, cy, r) {
+                            ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.clip();
+                            ctx.fillStyle = '#cccccc'; ctx.fill();
+                            ctx.fillStyle = '#999999'; // Craters
+                            ctx.beginPath(); ctx.arc(cx - r*0.3, cy - r*0.2, r*0.25, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(cx + r*0.4, cy + r*0.3, r*0.35, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(cx - r*0.1, cy + r*0.4, r*0.15, 0, Math.PI*2); ctx.fill();
+                            ctx.restore();
+                            ctx.shadowBlur = 15; ctx.shadowColor = '#ffffff';
+                            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
+                            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
+                            ctx.shadowBlur = 0;
+                        }
+
+                        function drawMissile(ctx, x, y, tx, ty) {
+                            const angle = Math.atan2(ty - y, tx - x);
+                            ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
+                            ctx.fillStyle = Math.random() > 0.5 ? '#ffcc00' : '#ff3300';
+                            ctx.beginPath(); ctx.moveTo(-15, -6); ctx.lineTo(-50, 0); ctx.lineTo(-15, 6); ctx.fill();
+                            ctx.fillStyle = '#eeeeee'; ctx.fillRect(-15, -4, 30, 8);
+                            ctx.fillStyle = '#ff0000'; ctx.beginPath(); ctx.moveTo(15, -4); ctx.lineTo(25, 0); ctx.lineTo(15, 4); ctx.fill();
+                            ctx.restore();
+                        }
+
+                        function drawNews(ctx, w, h, t) {
+                            ctx.save();
+                            // Handheld Camera Shake Effect
+                            const camX = Math.sin(t/150)*10 + Math.cos(t/100)*5;
+                            const camY = Math.cos(t/120)*8 + Math.sin(t/80)*4;
+                            ctx.translate(w/2, h/2); ctx.scale(1.05, 1.05); ctx.translate(-w/2 + camX, -h/2 + camY);
+                            
+                            // Flashing red emergency sky
+                            if (Math.floor(t / 400) % 2 === 0) { ctx.fillStyle = '#440000'; } else { ctx.fillStyle = '#220000'; }
+                            ctx.fillRect(0,0,w,h);
+                            
+                            // Dark stormy clouds in background
+                            ctx.fillStyle = 'rgba(10, 0, 0, 0.6)';
+                            ctx.beginPath(); ctx.ellipse(w*0.3 - (t*0.02)%w, h*0.2, 400, 100, 0, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.ellipse(w*0.8 - (t*0.03)%w, h*0.3, 500, 150, 0, 0, Math.PI*2); ctx.fill();
+
+                            // Public City Buildings (Silhouettes)
+                            ctx.fillStyle = '#0a0a0a';
+                            for(let i=-100; i<w+100; i+=140) {
+                                ctx.fillRect(i, h*0.4 + Math.sin(i)*100, 120, h);
+                                // Lit windows
+                                ctx.fillStyle = 'rgba(255, 200, 0, 0.3)';
+                                if(Math.random()>0.4) ctx.fillRect(i+20, h*0.5 + Math.sin(i)*100, 20, 30);
+                                if(Math.random()>0.4) ctx.fillRect(i+70, h*0.6 + Math.sin(i)*100, 20, 30);
+                                ctx.fillStyle = '#0a0a0a';
+                            }
+                            
+                            // Ground Street
+                            ctx.fillStyle = '#111'; ctx.fillRect(-100, h-180, w+200, 180);
+
+                            // Panicking Crowd Background Layer
+                            panicPeople.forEach(p => {
+                                p.x += p.speed;
+                                if (p.x > w + 100) p.x = -100;
+                                if (p.x < -100) p.x = w + 100;
+                                ctx.fillStyle = p.color;
+                                let px = p.x, py = h - p.y;
+                                ctx.beginPath(); ctx.arc(px, py-40*p.size, 10*p.size, 0, Math.PI*2); ctx.fill();
+                                ctx.fillRect(px-5*p.size, py-30*p.size, 10*p.size, 30*p.size);
+                                let legOffset = Math.sin(t*0.03 * p.speed)*15*p.size;
+                                ctx.strokeStyle = p.color; ctx.lineWidth = 4*p.size;
+                                ctx.beginPath(); ctx.moveTo(px, py-5*p.size); ctx.lineTo(px + legOffset, py + 20*p.size); ctx.stroke();
+                                ctx.beginPath(); ctx.moveTo(px, py-5*p.size); ctx.lineTo(px - legOffset, py + 20*p.size); ctx.stroke();
+                            });
+                            
+                            // Anchor Person - Standing in public holding mic
+                            const ax = w*0.75, ay = h-50;
+                            ctx.fillStyle = '#1a1a1a'; ctx.fillRect(ax - 55, ay - 200, 110, 200); // Suit body
+                            ctx.fillStyle = '#ffccaa'; ctx.beginPath(); ctx.arc(ax, ay - 230, 35, 0, Math.PI*2); ctx.fill(); // Head
+                            ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(ax, ay - 235, 36, Math.PI, 0); ctx.fill(); // Hair
+                            
+                            // Scary Red Eyes
+                            ctx.fillStyle = '#ff0000'; ctx.shadowBlur = 10; ctx.shadowColor = 'red';
+                            ctx.fillRect(ax - 15, ay - 238, 8, 4); ctx.fillRect(ax + 7, ay - 238, 8, 4);
+                            ctx.shadowBlur = 0;
+
+                            // Hand and Mic shaking in panic
+                            const micShake = Math.sin(t/50)*4;
+                            ctx.fillStyle = '#ffccaa'; ctx.beginPath(); ctx.arc(ax-35, ay-140+micShake, 15, 0, Math.PI*2); ctx.fill(); // Hand
+                            ctx.fillStyle = '#333'; ctx.fillRect(ax-45, ay-180+micShake, 10, 50); // Mic handle
+                            ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(ax-40, ay-185+micShake, 18, 0, Math.PI*2); ctx.fill(); // Mic top
+                            
+                            ctx.restore(); // Restore camera shake so UI overlays stay static
+
+                            // --- STATIC UI OVERLAYS ---
+
+                            // Huge PiP Screen (Missile taking off)
+                            const sw = 380, sh = 280, sx = 40, sy = 60;
+                            ctx.fillStyle = '#4aa3df'; ctx.fillRect(sx, sy, sw, sh);
+                            ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.strokeRect(sx, sy, sw, sh);
+                            
+                            // Clouds in PiP
+                            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                            ctx.beginPath(); ctx.arc(sx+100, sy+150, 40, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(sx+180, sy+120, 70, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(sx+260, sy+160, 50, 0, Math.PI*2); ctx.fill();
+
+                            // Launchpad & Rocket
+                            ctx.fillStyle = '#555'; ctx.fillRect(sx + sw/2 - 40, sy + sh - 40, 80, 40);
+                            let rY = sy + sh - (t/10000)*sh*2.0; // Slow launch over 10 seconds
+                            ctx.fillStyle = '#ddd'; ctx.fillRect(sx + sw/2 - 16, rY - 100, 32, 100);
+                            ctx.fillStyle = '#ff0000'; ctx.beginPath(); ctx.moveTo(sx+sw/2-16, rY-100); ctx.lineTo(sx+sw/2+16, rY-100); ctx.lineTo(sx+sw/2, rY-150); ctx.fill();
+                            
+                            // Massive Engine Flame
+                            const fSize = 30 + Math.random()*20;
+                            ctx.fillStyle = '#f90'; ctx.beginPath(); ctx.arc(sx + sw/2, rY + 10, fSize, 0, Math.PI*2); ctx.fill();
+                            ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.arc(sx + sw/2, rY + 5, fSize*0.6, 0, Math.PI*2); ctx.fill();
+                            
+                            // Smoke Plumes
+                            ctx.fillStyle = 'rgba(200,200,200,0.6)';
+                            for(let i=0; i<15; i++) {
+                                ctx.beginPath(); ctx.arc(sx+sw/2 + (Math.random()-0.5)*180, rY + 40 + Math.random()*180, 30+Math.random()*60, 0, Math.PI*2); ctx.fill();
+                            }
+                            
+                            // News Ticker (Detailed and Slower)
+                            ctx.fillStyle = 'rgba(0,0,0,0.9)'; ctx.fillRect(0, h-70, w, 70);
+                            ctx.fillStyle = '#fff'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'left';
+                            
+                            const msg = "BREAKING NEWS: UNAUTHORIZED NUCLEAR LAUNCH DETECTED FROM UNKNOWN ORIGIN... GLOBAL DEFENSE SYSTEMS REPORT CRITICAL FAILURE... TARGET ACQUIRED: THE LUNAR SURFACE... MILITARY ADVISES ALL CITIZENS TO SEEK SHELTER IMMEDIATELY... THIS IS NOT A DRILL... REPEAT, THIS IS NOT A DRILL... MAY GOD HELP US ALL...";
+                            const textWidth = ctx.measureText(msg).width;
+                            // Scroll text slowly over 16 seconds
+                            const scrollX = w - ((t % 16000) / 16000) * (w + textWidth);
+                            ctx.fillText(msg, scrollX, h-25);
+                            
+                            // Top LIVE borders
+                            ctx.fillStyle = '#ff3300'; ctx.fillRect(0, h-75, w, 5); 
+                            
+                            // LIVE Indicator
+                            if (Math.floor(t / 500) % 2 === 0) {
+                                ctx.fillStyle = 'red'; ctx.fillRect(40, 10, 100, 35);
+                                ctx.fillStyle = 'white'; ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center';
+                                ctx.fillText("LIVE", 90, 35);
+                            }
+                        }
+
+                        function drawLoop() {
+                            if (!document.getElementById(`${id}-nuke-canvas`)) return;
+                            cvs.width = cvs.clientWidth; cvs.height = cvs.clientHeight;
+                            const w = cvs.width, h = cvs.height;
+                            const t = Date.now() - startTime;
+
+                            // Phase 1: Extended News Broadcast (10 seconds)
+                            if (t < 10000) {
+                                drawNews(ctx, w, h, t);
+                            } 
+                            // Phase 2 & 3: Space Flight and Impact (17 seconds total space scene)
+                            else if (t < 27000) {
+                                const st = t - 10000; // space time mapping
+                                
+                                if (!spaceAudioPlayed) {
+                                    spaceAudioPlayed = true;
+                                    try {
+                                        const actx = new (window.AudioContext || window.webkitAudioContext)();
+                                        const osc = actx.createOscillator(); const gain = actx.createGain();
+                                        osc.type = 'sine'; osc.frequency.setValueAtTime(800, actx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, actx.currentTime + 8.0);
+                                        gain.gain.setValueAtTime(0.2, actx.currentTime); gain.gain.linearRampToValueAtTime(0.6, actx.currentTime + 8.0);
+                                        osc.connect(gain); gain.connect(actx.destination); osc.start(); osc.stop(actx.currentTime + 8.0);
+                                    } catch(e){}
+                                }
+
+                                // Draw Starfield
+                                ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+                                ctx.fillStyle = '#fff';
+                                stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x*w, s.y*h, s.s, 0, Math.PI*2); ctx.fill(); });
+                                
+                                const ex = w*0.15, ey = h*0.85, er = Math.min(w,h)*0.25;
+                                drawEarth(ctx, ex, ey, er, st);
+                                
+                                const mx = w*0.85, my = h*0.15, mr = Math.min(w,h)*0.1;
+                                
+                                // Phase 2: Missile Transit (8 seconds)
+                                if (st < 8000) {
+                                    drawMoon(ctx, mx, my, mr);
+                                    const pr = st / 8000; // progress from 0 to 1
+                                    const exEased = ex + (mx-ex)*pr;
+                                    const eyEased = ey + (my-ey)*pr;
+                                    drawMissile(ctx, exEased, eyEased, mx, my);
+                                } 
+                                // Phase 3: Shatter and Fall (9 seconds)
+                                else {
+                                    if (!impacted) { impacted = true; initDebris(mx, my); flashAlpha = 1; }
+                                    
+                                    // Render flaming shattering debris
+                                    debris.forEach(d => {
+                                        d.x += d.vx; d.y += d.vy; d.scale += d.scaleSpeed; d.rot += d.rotV;
+                                        ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(d.rot); ctx.scale(d.scale, d.scale);
+                                        ctx.fillStyle = '#888'; ctx.fillRect(-d.size/2, -d.size/2, d.size, d.size);
+                                        ctx.fillStyle = 'rgba(255, 100, 0, 0.6)'; ctx.fillRect(-d.size/2-3, -d.size/2-3, d.size+6, d.size+6);
+                                        ctx.restore();
+                                    });
+                                    
+                                    if (flashAlpha > 0) {
+                                        ctx.fillStyle = `rgba(255, 200, 0, ${flashAlpha})`; ctx.fillRect(0,0,w,h);
+                                        flashAlpha -= 0.03;
+                                    }
+                                    
+                                    // Massive screen shake as debris approaches screen
+                                    if (st > 12000) {
+                                        cvs.style.transform = `translate(${(Math.random()-0.5)*40}px, ${(Math.random()-0.5)*40}px)`;
+                                    }
+                                }
+                            } 
+                            // Phase 4: BSOD Trigger
+                            else {
+                                if(!window.bsodTriggered) {
+                                    window.bsodTriggered = true;
+                                    cvs.style.transform = 'none';
+                                    const flash = document.createElement('div');
+                                    flash.className = 'nuke-overlay';
+                                    document.body.appendChild(flash);
+                                    
+                                    const bsod = document.getElementById('fake-bsod');
+                                    bsod.querySelector('h2').innerText = "FATAL ERROR: LUNAR COLLISION DETECTED.";
+                                    bsod.querySelector('p').innerText = "Earth has been destroyed by falling debris.";
+                                    
+                                    setTimeout(() => EasterEggs.fakeBSOD(), 1000);
+                                }
+                            }
+                            if(!window.bsodTriggered) requestAnimationFrame(drawLoop);
+                        }
+                        
+                        drawLoop();
+                        return; // Exit init so standard browser logic doesn't attach
+                    }
+
+                    const navigate = async () => {
+                        let url = urlInput.value.trim();
+                        
+                        // --- EASTER EGG 1: DO A BARREL ROLL ---
+                        if (url.toLowerCase() === "do a barrel roll") {
+                            winEl.classList.add('barrel-roll');
+                            setTimeout(() => {
+                                winEl.classList.remove('barrel-roll');
+                                urlInput.value = "os://home";
+                                navigate();
+                            }, 1000);
+                            EasterEggs.showToast("Whoa! 🛩️");
+                            return;
+                        }
+
+                        // --- EASTER EGG 2: DINO GAME ---
+                        if (url.toLowerCase() === "os://dino" || url.toLowerCase() === "chrome://dino") {
+                            showCustom(`
+                                <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#333; outline:none;" tabindex="0" id="${id}-dino-wrap">
+                                    <h2 style="margin-bottom:10px; font-family:monospace; color:var(--accent);">T-Rex Runner</h2>
+                                    <canvas id="${id}-dino-canvas" width="600" height="200" style="border-bottom:2px solid #666; cursor:pointer; background:#f7f7f7; border-radius:8px; box-shadow:inset 0 0 10px rgba(0,0,0,0.05);"></canvas>
+                                    <p style="margin-top:15px; font-family:monospace;">Press SPACE or Click to jump.</p>
+                                    <button onclick="document.getElementById('${id}-url').value='os://home'; document.getElementById('${id}-go').click();" style="margin-top:20px; padding:8px 16px; background:var(--active-bg); color:var(--text-main); border:1px solid var(--glass-border); border-radius:6px; cursor:pointer;">Exit Game</button>
+                                </div>
+                            `);
+                            
+                            const wrap = document.getElementById(`${id}-dino-wrap`);
+                            const canvas = document.getElementById(`${id}-dino-canvas`);
+                            const ctx = canvas.getContext('2d');
+                            wrap.focus();
+
+                            let isPlaying = true;
+                            let frameId;
+                            // Slower gravity, softer jump
+                            let dino = { x: 50, y: 150, w: 20, h: 40, dy: 0, gravity: 0.25, jump: -6.5, isJumping: false };
+                            let cacti = [];
+                            let score = 0;
+                            let frameCount = 0;
+
+                            function reset() {
+                                dino = { x: 50, y: 150, w: 20, h: 40, dy: 0, gravity: 0.25, jump: -6.5, isJumping: false };
+                                cacti = [];
+                                score = 0;
+                                frameCount = 0;
+                                isPlaying = true;
+                            }
+
+                            function jump() {
+                                if (!dino.isJumping && isPlaying) {
+                                    dino.dy = dino.jump;
+                                    dino.isJumping = true;
+                                } else if (!isPlaying) {
+                                    reset();
+                                    loop();
+                                }
+                            }
+
+                            wrap.addEventListener('keydown', e => {
+                                if (e.code === 'Space') { e.preventDefault(); jump(); }
+                            });
+                            canvas.addEventListener('mousedown', jump);
+
+                            function loop() {
+                                if (!document.getElementById(`${id}-dino-canvas`)) return; // Cleanup when navigating away
+                                if (!isPlaying) return;
+
+                                // Physics update
+                                dino.dy += dino.gravity;
+                                dino.y += dino.dy;
+                                if (dino.y > 150) { dino.y = 150; dino.dy = 0; dino.isJumping = false; }
+
+                                // Spawn obstacles (lower spawn rate to match slower speed)
+                                if (frameCount % Math.max(80, 150 - Math.floor(score/40)) === 0) {
+                                    cacti.push({ x: 600, y: 160, w: 15 + Math.random()*15, h: 30 });
+                                }
+                                
+                                // Move obstacles based on score speed (slower base speed)
+                                let gameSpeed = 3 + (score / 800);
+                                cacti.forEach(c => c.x -= gameSpeed);
+                                cacti = cacti.filter(c => c.x + c.w > 0);
+
+                                // Collision detection
+                                for (let c of cacti) {
+                                    if (dino.x < c.x + c.w && dino.x + dino.w > c.x && dino.y < c.y + c.h && dino.y + dino.h > c.y) {
+                                        isPlaying = false;
+                                    }
+                                }
+                                score++;
+                                frameCount++;
+
+                                // Draw
+                                ctx.clearRect(0,0,600,200);
+                                
+                                // Draw dino
+                                ctx.fillStyle = '#535353';
+                                ctx.fillRect(dino.x, dino.y, dino.w, dino.h);
+                                ctx.fillStyle = '#fff'; // eye
+                                ctx.fillRect(dino.x + 12, dino.y + 6, 4, 4);
+
+                                // Draw cacti
+                                ctx.fillStyle = '#2ecc71';
+                                cacti.forEach(c => ctx.fillRect(c.x, c.y, c.w, c.h));
+                                
+                                // Draw score
+                                ctx.fillStyle = '#333';
+                                ctx.font = '16px monospace';
+                                ctx.textAlign = 'right';
+                                ctx.fillText(`Score: ${Math.floor(score/10)}`, 580, 30);
+
+                                if (!isPlaying) {
+                                    ctx.fillStyle = '#e74c3c';
+                                    ctx.font = '30px monospace';
+                                    ctx.textAlign = 'center';
+                                    ctx.fillText(`GAME OVER`, 300, 100);
+                                    ctx.fillStyle = '#555';
+                                    ctx.font = '16px monospace';
+                                    ctx.fillText(`Click or Space to restart`, 300, 130);
+                                } else {
+                                    frameId = requestAnimationFrame(loop);
+                                }
+                            }
+                            loop();
+                            EasterEggs.showToast("Dino Game unlocked! 🦖");
+                            return;
+                        }
+
+                        // --- EASTER EGG 3: DVD BOUNCE ---
+                        if (url.toLowerCase() === "os://dvd") {
+                            showCustom(`
+                                <div id="${id}-dvd-container" style="position:relative; width:100%; height:100%; background:black; overflow:hidden; border-radius:8px;">
+                                    <div id="${id}-dvd-logo" style="position:absolute; font-size:54px; font-weight:900; color:#ff0000; text-shadow:3px 3px 0 rgba(255,255,255,0.3); font-family:sans-serif; pointer-events:none;">DVD</div>
+                                    <button onclick="document.getElementById('${id}-url').value='os://home'; document.getElementById('${id}-go').click();" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); padding:8px 16px; background:rgba(255,255,255,0.2); color:white; border:none; border-radius:6px; cursor:pointer; backdrop-filter:blur(5px);">Exit</button>
+                                </div>
+                            `);
+                            
+                            const container = document.getElementById(`${id}-dvd-container`);
+                            const logo = document.getElementById(`${id}-dvd-logo`);
+                            let x = 50, y = 50, dx = 3, dy = 3;
+                            const colors = ['#ff0000', '#00ff00', '#0088ff', '#ffff00', '#ff00ff', '#00ffff'];
+                            
+                            function bounce() {
+                                if(!document.getElementById(`${id}-dvd-container`)) return; // Cleanup on exit
+                                
+                                const rect = container.getBoundingClientRect();
+                                const logoRect = logo.getBoundingClientRect();
+                                
+                                x += dx; y += dy;
+                                
+                                let hit = false;
+                                if(x + logoRect.width >= rect.width || x <= 0) { dx *= -1; hit = true; }
+                                if(y + logoRect.height >= rect.height || y <= 0) { dy *= -1; hit = true; }
+                                
+                                if (hit) {
+                                    logo.style.color = colors[Math.floor(Math.random() * colors.length)];
+                                }
+                                
+                                logo.style.left = x + 'px';
+                                logo.style.top = y + 'px';
+                                requestAnimationFrame(bounce);
+                            }
+                            bounce();
+                            EasterEggs.showToast("Will it hit the corner? 📀");
+                            return;
+                        }
+
+                        // --- DEFAULT HOME PAGE ---
+                        if (url.toLowerCase() === "os://home" || url === "") {
+                            urlInput.value = "os://home";
+                            showCustom(`
+                                <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#333;">
+                                    <h1 style="font-size:48px; margin-bottom:10px; color:var(--accent);">🌍 Smart Browser</h1>
+                                    <p style="margin-bottom:30px; font-size:18px; color:#666;">Type a URL or search using AI.</p>
+                                    <div style="display:flex; gap:20px; margin-bottom:40px;">
+                                        <a href="#" onclick="document.getElementById('${id}-url').value='https://en.wikipedia.org/wiki/Main_Page'; document.getElementById('${id}-go').click();" style="text-decoration:none; color:var(--accent); font-weight:bold; padding:10px 20px; border-radius:8px; background:rgba(0,103,192,0.1); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,103,192,0.2)'" onmouseout="this.style.background='rgba(0,103,192,0.1)'">Wikipedia</a>
+                                        <a href="#" onclick="document.getElementById('${id}-url').value='Explain Quantum Computing in simple terms'; document.getElementById('${id}-go').click();" style="text-decoration:none; color:var(--accent); font-weight:bold; padding:10px 20px; border-radius:8px; background:rgba(0,103,192,0.1); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,103,192,0.2)'" onmouseout="this.style.background='rgba(0,103,192,0.1)'">Try AI Search ✨</a>
+                                    </div>
+                                    
+                                    <div style="border-top:1px solid #ddd; padding-top:20px; text-align:center; width:80%;">
+                                        <p style="color:#888; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:15px;">🤫 Hidden Secrets to Try</p>
+                                        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                                            <button onclick="document.getElementById('${id}-url').value='do a barrel roll'; document.getElementById('${id}-go').click();" style="padding:6px 15px; background:#f1f1f1; border:1px solid #ccc; border-radius:20px; cursor:pointer; color:#555; font-size:13px; font-weight:bold; transition:all 0.2s;" onmouseover="this.style.background='#e5e5e5'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='#f1f1f1'; this.style.transform='scale(1)';">do a barrel roll 🛩️</button>
+                                            <button onclick="document.getElementById('${id}-url').value='os://dino'; document.getElementById('${id}-go').click();" style="padding:6px 15px; background:#f1f1f1; border:1px solid #ccc; border-radius:20px; cursor:pointer; color:#555; font-size:13px; font-weight:bold; transition:all 0.2s;" onmouseover="this.style.background='#e5e5e5'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='#f1f1f1'; this.style.transform='scale(1)';">os://dino 🦖</button>
+                                            <button onclick="document.getElementById('${id}-url').value='os://dvd'; document.getElementById('${id}-go').click();" style="padding:6px 15px; background:#f1f1f1; border:1px solid #ccc; border-radius:20px; cursor:pointer; color:#555; font-size:13px; font-weight:bold; transition:all 0.2s;" onmouseover="this.style.background='#e5e5e5'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='#f1f1f1'; this.style.transform='scale(1)';">os://dvd 📀</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
+                            return;
+                        }
+
+                        // --- CHECK IF URL OR SEARCH ---
+                        const isUrl = url.startsWith('http://') || url.startsWith('https://') || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(url);
+                        
+                        if (isUrl) {
+                            if (!url.startsWith('http')) url = 'https://' + url;
+                            urlInput.value = url;
+                            showFrame(url);
+                            EasterEggs.showToast("Note: Some modern sites may refuse to connect inside iframes.");
+                        } else {
+                            // --- AI SMART SEARCH ---
+                            showCustom(`
+                                <div style="display:flex; flex-direction:column; align-items:center; margin-top:100px;">
+                                    <div class="spinner" style="border-top-color:var(--accent); margin-bottom:20px;"></div>
+                                    <p style="color:#666;">Searching the Smart Web for: <b>${url}</b>...</p>
+                                </div>
+                            `);
+                            
+                            const prompt = `You are the smart search engine built into a web browser. The user searched for: "${url}". Provide a helpful, factual, and well-formatted HTML response answering their query. Use HTML tags like <h2>, <p>, <ul>, <li> for styling. DO NOT use markdown code blocks (like \`\`\`html). Just return raw HTML.`;
+                            
+                            const response = await GeminiAPI.ask(url, prompt);
+                            
+                            showCustom(`
+                                <div style="max-width:800px; margin:0 auto; line-height:1.6; color:#333; padding-bottom:40px;">
+                                    <div style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:20px;">
+                                        <p style="color:#888; font-size:12px; text-transform:uppercase; letter-spacing:1px;">✨ Smart Search Results</p>
+                                        <h1 style="margin:5px 0;">${url}</h1>
+                                    </div>
+                                    ${response.replace(/```html|```/g, '')}
+                                </div>
+                            `);
+                        }
+                    };
+
+                    goBtn.onclick = navigate;
+                    urlInput.onkeydown = (e) => { if (e.key === 'Enter') navigate(); };
+                    
+                    // Start on home page
+                    navigate();
+                }
+            },
             'explorer': {
                 name: 'This PC', icon: '🖥️', width: 750, height: 500,
                 render: (id) => `
@@ -456,7 +1313,7 @@
                             el.innerHTML = `<span>${item.icon}</span><p style="color:var(--text-main);">${item.name}</p>`;
                             el.ondblclick = () => {
                                 if (item.type === 'app') WindowManager.launch(item.target);
-                                else if (item.type === 'file') WindowManager.launch('notepad', { title: item.name, content: item.content });
+                                else if (item.type === 'file') WindowManager.launch('notepad', { title: item.name, content: item.content, isLocked: item.isLocked, password: item.password });
                                 else if (item.type === 'dir') renderFolder(item.target);
                             };
                             el.oncontextmenu = (e) => {
@@ -582,8 +1439,15 @@
             'notepad': {
                 name: 'Notepad', icon: '📝', width: 600, height: 400,
                 render: (id) => `
-                    <div class="app-notepad" style="display:flex; flex-direction:column; height:100%;">
-                        <div style="display:flex; background:rgba(0,0,0,0.2); padding:8px; gap:10px; border-bottom:1px solid var(--glass-border);">
+                    <div class="app-notepad" style="display:flex; flex-direction:column; height:100%; position:relative;">
+                        <div id="${id}-lock-screen" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:var(--win-bg); z-index:10; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center;">
+                            <h2 style="color:var(--accent); margin-bottom:10px; font-size:32px;">🔒 Locked File</h2>
+                            <p style="margin-bottom:20px; color:var(--text-secondary);">This file is encrypted. Enter password to view.</p>
+                            <input type="password" id="${id}-pwd-input" style="padding:10px; border-radius:6px; border:1px solid var(--glass-border); background:var(--input-bg); color:white; margin-bottom:15px; text-align:center; width:200px; outline:none;" placeholder="Password">
+                            <button id="${id}-pwd-btn" style="padding:10px 24px; background:var(--accent); color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">Unlock</button>
+                            <p id="${id}-pwd-hint" style="margin-top:20px; font-size:13px; color:#ff0033; display:none; background:rgba(255,0,0,0.1); padding:8px 12px; border-radius:6px;"><b>Hint:</b> The admin hid the password inside another secret document...</p>
+                        </div>
+                        <div id="${id}-toolbar" style="display:flex; background:rgba(0,0,0,0.2); padding:8px; gap:10px; border-bottom:1px solid var(--glass-border);">
                             <button id="${id}-ai-improve" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#00a4ef; padding:6px 12px; border-radius:20px; cursor:pointer; font-weight:bold; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,164,239,0.2)'" onmouseout="this.style.background='transparent'">✨ Improve Text</button>
                             <button id="${id}-ai-summarize" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#00a4ef; padding:6px 12px; border-radius:20px; cursor:pointer; font-weight:bold; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,164,239,0.2)'" onmouseout="this.style.background='transparent'">✨ Summarize</button>
                         </div>
@@ -591,9 +1455,50 @@
                     </div>`,
                 init: (id, state) => {
                     const textarea = document.getElementById(`${id}-text`);
-                    if (state && state.content) {
+                    const lockScreen = document.getElementById(`${id}-lock-screen`);
+                    const toolbar = document.getElementById(`${id}-toolbar`);
+                    const pwdInput = document.getElementById(`${id}-pwd-input`);
+                    const pwdBtn = document.getElementById(`${id}-pwd-btn`);
+                    const pwdHint = document.getElementById(`${id}-pwd-hint`);
+                    
+                    if (state && state.title) {
+                        document.getElementById(id).querySelector('.win-title').innerText = state.title + ' - Notepad';
+                    }
+
+                    if (state && state.isLocked) {
+                        lockScreen.style.display = 'flex';
+                        textarea.style.display = 'none';
+                        toolbar.style.display = 'none';
+                        
+                        let attempts = 0;
+                        const tryUnlock = () => {
+                            if (pwdInput.value === state.password) {
+                                if (state.title === 'CONFIDENTIAL.txt') {
+                                    lockScreen.style.display = 'none';
+                                    EasterEggs.nukeScreen(); // Trigger the nuke!
+                                } else {
+                                    lockScreen.style.display = 'none';
+                                    textarea.style.display = 'block';
+                                    toolbar.style.display = 'flex';
+                                    textarea.value = state.content;
+                                    EasterEggs.showToast("File Unlocked 🔓");
+                                }
+                            } else {
+                                attempts++;
+                                EasterEggs.showToast("Access Denied.");
+                                pwdInput.value = '';
+                                if (attempts >= 2) pwdHint.style.display = 'block';
+                            }
+                        };
+                        
+                        pwdBtn.onclick = tryUnlock;
+                        pwdInput.onkeydown = (e) => { if (e.key === 'Enter') tryUnlock(); };
+                    } else if (state && state.content) {
                         textarea.value = state.content;
-                        if (state.title) document.getElementById(id).querySelector('.win-title').innerText = state.title + ' - Notepad';
+                        // Easter Egg Check for the Treasure Hunt
+                        if (state.title === 'TOP_SECRET.txt') {
+                            setTimeout(() => EasterEggs.shootScreen(), 1000);
+                        }
                     }
 
                     document.getElementById(`${id}-ai-improve`).onclick = async () => {
@@ -617,7 +1522,7 @@
                 name: 'Terminal', icon: '>_', width: 650, height: 400,
                 render: (id) => `
                     <div class="app-terminal" onclick="document.getElementById('${id}-input').focus()">
-                        <div class="term-output" id="${id}-out">Windows PowerShell\nCopyright (C) Microsoft Corporation. All rights reserved.\n\nTry typing 'help' or 'matrix'.\n\n</div>
+                        <div class="term-output" id="${id}-out">Windows PowerShell\nCopyright (C) Microsoft Corporation. All rights reserved.\n\nType 'help' to see available commands.\n\n</div>
                         <div class="term-input-line">
                             <span class="term-prompt">PS C:\\></span>
                             <input type="text" class="term-input" id="${id}-input" autocomplete="off" spellcheck="false">
@@ -634,7 +1539,7 @@
                             input.value = '';
 
                             switch(cmd) {
-                                case 'help': out.innerHTML += "Commands: help, clear, date, whoami, sudo, matrix, ping\n"; break;
+                                case 'help': out.innerHTML += "Commands: help, clear, date, whoami, sudo, matrix, ping\n\n[SYSTEM HINT]: Want to unleash the ULTIMATE gaming look? Type 'transform'.\n"; break;
                                 case 'clear': out.innerHTML = ""; break;
                                 case 'date': out.innerHTML += new Date().toString() + "\n"; break;
                                 case 'whoami': out.innerHTML += "desktop-user\\guest (But you're a hacker at heart)\n"; break;
@@ -647,6 +1552,11 @@
                                 case 'matrix':
                                     out.innerHTML += "Wake up, Neo...\n";
                                     EasterEggs.startMatrix();
+                                    break;
+                                case 'transform':
+                                case 'ultimate transformer mode':
+                                    out.innerHTML += ">> OVERRIDE DETECTED.\n>> INITIATING ULTIMATE TRANSFORMER MODE...\n";
+                                    EasterEggs.activateTransformerMode();
                                     break;
                                 case '': break;
                                 default: out.innerHTML += `${cmd}: command not found\n`;
@@ -1220,6 +2130,17 @@
 
         // --- 4. SYSTEM BOOT & OPERATIONS ---
         const System = {
+            wallpapers: [
+                "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')",
+                "url('https://images.unsplash.com/photo-1477346611705-65d1883cee1e?q=80&w=2564&auto=format&fit=crop')",
+                "url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop')",
+                "url('https://images.unsplash.com/photo-1518655048521-f130df041f66?q=80&w=2564&auto=format&fit=crop')"
+            ],
+            currentWallpaperIndex: 0,
+            nextBackground: () => {
+                System.currentWallpaperIndex = (System.currentWallpaperIndex + 1) % System.wallpapers.length;
+                document.documentElement.style.setProperty('--bg-wallpaper', System.wallpapers[System.currentWallpaperIndex]);
+            },
             renderDesktop: () => {
                 const desktop = document.getElementById('desktop');
                 desktop.innerHTML = ''; // Clear previous icons
@@ -1240,7 +2161,7 @@
                     el.ondblclick = () => {
                         el.classList.remove('selected');
                         if(item.type === 'app') WindowManager.launch(item.target);
-                        else WindowManager.launch('notepad', { title: item.name, content: item.content });
+                        else WindowManager.launch('notepad', { title: item.name, content: item.content, isLocked: item.isLocked, password: item.password });
                     };
 
                     el.oncontextmenu = (e) => {
@@ -1281,6 +2202,12 @@
                 // Initial Boot Sequence
                 setTimeout(() => {
                     document.getElementById('boot-screen').style.opacity = '0';
+                    
+                    // Play user-provided startup sound
+                    let bootSound = new Audio('startup.mp3');
+                    bootSound.volume = 0.5;
+                    bootSound.play().catch(err => console.log("Browser prevented audio autoplay", err));
+
                     setTimeout(() => {
                         document.getElementById('boot-screen').style.display = 'none';
                         document.getElementById('logon-pwd').focus();
@@ -1309,6 +2236,7 @@
                                 EasterEggs.showToast(desktop.style.display === 'none' ? "Desktop Icons Hidden" : "Desktop Icons Shown");
                             }},
                             { label: 'Refresh', icon: '🔄', action: () => System.renderDesktop() },
+                            { label: 'Next Desktop Background', icon: '🖼️', action: () => System.nextBackground() },
                             'divider',
                             { label: 'New Folder', icon: '📁', action: () => {
                                 let name = 'New Folder'; let i = 1;
@@ -1410,9 +2338,23 @@
                 // Play fake startup sound if we wanted to
                 EasterEggs.showToast("Welcome back! 🎉");
             },
+            restart: () => {
+                document.getElementById('start-menu').classList.remove('visible');
+                const sd = document.getElementById('shutdown-screen');
+                document.getElementById('shutdown-text').innerText = "Restarting...";
+                document.querySelector('#shutdown-screen .spinner').style.display = 'block';
+                sd.style.opacity = '1';
+                sd.style.pointerEvents = 'auto';
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            },
             shutdown: () => {
                 document.getElementById('start-menu').classList.remove('visible');
                 const sd = document.getElementById('shutdown-screen');
+                document.getElementById('shutdown-text').innerText = "Shutting down...";
+                document.querySelector('#shutdown-screen .spinner').style.display = 'block';
                 sd.style.opacity = '1';
                 sd.style.pointerEvents = 'auto';
                 setTimeout(() => {
@@ -1542,6 +2484,223 @@
                         drops[i]++;
                     }
                 }, 33);
+            },
+            shootScreen: () => {
+                let shots = 0;
+                EasterEggs.showToast("INCOMING FIRE! GET DOWN!");
+                const shootInterval = setInterval(() => {
+                    if (shots > 7) {
+                        clearInterval(shootInterval);
+                        return;
+                    }
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    
+                    // Audio flash (gunshot/shatter sound synthesis)
+                    try {
+                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(100, ctx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(10, ctx.currentTime + 0.1);
+                        
+                        gain.gain.setValueAtTime(1, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                        
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(); osc.stop(ctx.currentTime + 0.1);
+                    } catch(e){}
+
+                    // Visual hole
+                    const hole = document.createElement('div');
+                    hole.className = 'bullet-hole';
+                    hole.style.left = x + 'px';
+                    hole.style.top = y + 'px';
+                    
+                    // Add crack lines
+                    for(let i=0; i<5; i++) {
+                        const crack = document.createElement('div');
+                        crack.className = 'bullet-crack';
+                        crack.style.transform = `rotate(${Math.random() * 360}deg)`;
+                        hole.appendChild(crack);
+                    }
+
+                    document.body.appendChild(hole);
+                    
+                    // Violent Screen shake
+                    document.body.style.transform = `translate(${(Math.random()-0.5)*30}px, ${(Math.random()-0.5)*30}px)`;
+                    setTimeout(() => document.body.style.transform = 'none', 50);
+
+                    shots++;
+                }, 400);
+            },
+            nukeScreen: () => {
+                document.querySelectorAll('.sys-window').forEach(w => w.remove());
+                
+                const cd = document.getElementById('nuke-countdown');
+                const timerVal = document.getElementById('nuke-timer-val');
+                cd.style.display = 'flex';
+                timerVal.innerText = '3';
+
+                // Audio Beep Helper
+                const beep = (freq, type, duration) => {
+                    try {
+                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = type;
+                        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(); osc.stop(ctx.currentTime + duration);
+                    } catch(e){}
+                };
+
+                beep(400, 'square', 0.5);
+
+                setTimeout(() => { timerVal.innerText = '2'; beep(400, 'square', 0.5); }, 1000);
+                setTimeout(() => { timerVal.innerText = '1'; beep(400, 'square', 0.5); }, 2000);
+                setTimeout(() => {
+                    timerVal.innerText = 'LAUNCH';
+                    beep(800, 'sawtooth', 1.5);
+                    
+                    setTimeout(() => {
+                        cd.style.display = 'none';
+                        
+                        // Start Siren & Cursor Sequence
+                        document.body.classList.add('siren-active');
+                        EasterEggs.showToast("WARNING: HIGH LEVEL CLEARANCE BREACHED.");
+                        
+                        // Web Audio Siren
+                        try {
+                            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'square';
+                            gain.gain.value = 0.1;
+                            osc.connect(gain); gain.connect(ctx.destination);
+                            
+                            osc.frequency.setValueAtTime(400, ctx.currentTime);
+                            osc.frequency.linearRampToValueAtTime(700, ctx.currentTime + 1.0);
+                            osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 2.0);
+                            osc.frequency.linearRampToValueAtTime(700, ctx.currentTime + 3.0);
+                            osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 4.0);
+                            
+                            osc.start(); osc.stop(ctx.currentTime + 4.5);
+                        } catch(e){}
+
+                        // Launch Ghost Cursor Cutscene
+                        setTimeout(() => {
+                            const cursor = document.getElementById('fake-cursor');
+                            cursor.style.display = 'block';
+                            cursor.style.left = '50vw';
+                            cursor.style.top = '50vh';
+
+                            // Find Browser Icon in Taskbar
+                            const browserBtn = document.getElementById('tb_app_browser');
+                            if (!browserBtn) return; // Fallback
+                            const btnRect = browserBtn.getBoundingClientRect();
+
+                            setTimeout(() => {
+                                // Move cursor to browser
+                                cursor.style.left = (btnRect.left + 15) + 'px';
+                                cursor.style.top = (btnRect.top + 15) + 'px';
+
+                                setTimeout(() => {
+                                    // Click animation
+                                    cursor.style.transform = 'scale(0.8)';
+                                    setTimeout(() => {
+                                        cursor.style.transform = 'scale(1)';
+                                        setTimeout(() => {
+                                            cursor.style.display = 'none';
+                                            // Launch browser with the cutscene override flag
+                                            WindowManager.launch('browser', { isNukeCutscene: true });
+                                            const win = document.querySelector('.sys-window[data-app-id="browser"]');
+                                            if(win) win.classList.add('maximized');
+                                            document.body.classList.remove('siren-active');
+                                        }, 300);
+                                    }, 100);
+                                }, 1300); // Wait for cursor to travel
+                            }, 100);
+                        }, 1000); // Start cursor after 1s of siren
+
+                    }, 1000); // Wait 1s on "LAUNCH" before fading
+                }, 3000);
+            },
+            fakeBSOD: () => {
+                // Play a sharp glitch noise
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(50, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 1);
+                    osc.connect(ctx.destination);
+                    osc.start(); osc.stop(ctx.currentTime + 1);
+                } catch(e){}
+
+                document.getElementById('start-menu').classList.remove('visible');
+                document.getElementById('fake-bsod').style.display = 'block';
+                
+                // Show BSOD for 5 seconds, then fade to Credits
+                setTimeout(() => {
+                    document.getElementById('fake-bsod').style.display = 'none';
+                    EasterEggs.showCredits();
+                }, 5000);
+            },
+            showCredits: () => {
+                const credits = document.getElementById('credits-screen');
+                credits.style.display = 'flex';
+                setTimeout(() => credits.style.opacity = '1', 100);
+                
+                // Render beautiful stars for credits
+                const cvs = document.getElementById('credits-stars');
+                const ctx = cvs.getContext('2d');
+                cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+                
+                ctx.fillStyle = '#000'; ctx.fillRect(0,0,cvs.width,cvs.height);
+                ctx.fillStyle = '#fff';
+                for(let i=0; i<300; i++) {
+                    ctx.globalAlpha = Math.random() * 0.8 + 0.2;
+                    ctx.beginPath();
+                    ctx.arc(Math.random()*cvs.width, Math.random()*cvs.height, Math.random()*1.5, 0, Math.PI*2);
+                    ctx.fill();
+                }
+                
+                // Finally, Reboot System
+                setTimeout(() => {
+                    window.location.reload();
+                }, 6000);
+            },
+            activateTransformerMode: () => {
+                // Play user-provided Gamemode Sound
+                let gamemodeSound = new Audio('Gamemode.mp3');
+                gamemodeSound.volume = 0.8;
+                gamemodeSound.play().catch(err => console.log("Browser prevented audio playback", err));
+
+                // Trigger Advanced Screen Glitch & Flash Animation
+                document.body.classList.add('transform-anim');
+                document.getElementById('glitch-overlay').classList.add('flash-anim');
+                
+                // Swap the theme precisely at the peak of the glitch animation
+                setTimeout(() => {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    document.documentElement.setAttribute('data-theme', currentTheme === 'gaming' ? 'dark' : 'gaming');
+                }, 1250); 
+                
+                // Cleanup and notify
+                setTimeout(() => {
+                    document.body.classList.remove('transform-anim');
+                    document.getElementById('glitch-overlay').classList.remove('flash-anim');
+                    if (document.documentElement.getAttribute('data-theme') === 'gaming') {
+                        EasterEggs.showToast("SYSTEM OVERRIDE: ULTIMATE GAMING MODE ENGAGED 🚀");
+                    } else {
+                        EasterEggs.showToast("SYSTEM RESTORED: Default theme loaded.");
+                    }
+                }, 2500);
             }
         };
 

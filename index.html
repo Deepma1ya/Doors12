@@ -3470,11 +3470,13 @@
                 win.id = winId;
                 win.dataset.appId = appId;
                 
-                const finalWidth = app.width;
-                const finalHeight = app.height;
+                const isMobile = window.innerWidth <= 640;
+                const finalWidth = isMobile ? Math.min(app.width, window.innerWidth - 10) : app.width;
+                const finalHeight = isMobile ? Math.min(app.height, window.innerHeight - 60) : app.height;
+
                 const offset = (document.querySelectorAll('.sys-window').length * 30) % 150;
-                const finalLeft = Math.max(0, (window.innerWidth - finalWidth) / 2 + offset - 75);
-                const finalTop = Math.max(0, (window.innerHeight - 48 - finalHeight) / 2);
+                const finalLeft = isMobile ? 5 : Math.max(0, (window.innerWidth - finalWidth) / 2 + offset - 75);
+                const finalTop = isMobile ? 5 : Math.max(0, (window.innerHeight - 48 - finalHeight) / 2);
 
                 win.style.width = finalWidth + 'px';
                 win.style.height = finalHeight + 'px';
@@ -3854,12 +3856,7 @@
                 // Initial Boot Sequence (Increased timer so users can read the tip)
                 setTimeout(() => {
                     document.getElementById('boot-screen').style.opacity = '0';
-                    
-                    // Play user-provided startup sound
-                    let bootSound = new Audio('startup.mp3');
-                    bootSound.volume = 0.5;
-                    bootSound.play().catch(err => console.log("Browser prevented audio autoplay", err));
-
+                
                     setTimeout(() => {
                         document.getElementById('boot-screen').style.display = 'none';
                         document.getElementById('logon-pwd').focus();
@@ -4129,7 +4126,11 @@
                 logon.style.backdropFilter = 'blur(0px)';
                 setTimeout(() => logon.style.display = 'none', 800);
                 
-                // Play fake startup sound if we wanted to
+                // Play startup sound on successful login
+                let loginSound = new Audio('startup.mp3');
+                loginSound.volume = 0.5;
+                loginSound.play().catch(err => console.log("Browser prevented audio autoplay", err));
+
                 EasterEggs.showToast("Welcome back! 🎉");
             },
             restart: () => {
@@ -4201,10 +4202,6 @@
 
                 setTimeout(() => {
                     bootScreen.style.opacity = '0';
-                    let bootSound = new Audio('startup.mp3');
-                    bootSound.volume = 0.5;
-                    bootSound.play().catch(err => console.log("Browser prevented audio autoplay", err));
-
                     setTimeout(() => {
                         bootScreen.style.display = 'none';
                         document.getElementById('logon-pwd').focus();

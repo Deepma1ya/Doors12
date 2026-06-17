@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prism Rush: The Troll Gauntlet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0a18;
+    --bg2:#140f28;
+    --panel:#1b1538;
+    --magenta:#ff2e88;
+    --yellow:#ffd400;
+    --mint:#4bffb0;
+    --lavender:#c9b8ff;
+    --ink:#f4f0ff;
+    --shadow: 6px 6px 0 rgba(0,0,0,0.55);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background: radial-gradient(circle at 50% 0%, var(--bg2), var(--bg) 70%);
+    color:var(--ink);
+    font-family:'Space Grotesk', system-ui, sans-serif;
+    overflow:hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pixel{ font-family:'Press Start 2P', monospace; letter-spacing:1px; }
+
+  #app{
+    position:relative;
+    width:100vw; height:100vh;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #stage{
+    position:relative;
+    width:min(96vw, 960px);
+    aspect-ratio: 960/420;
+    border-radius:16px;
+    border: 3px solid var(--lavender);
+    box-shadow: 0 0 0 6px var(--bg2), 0 0 40px rgba(255,46,136,0.25), var(--shadow);
+    overflow:hidden;
+    background:#0c0a18;
+  }
+  canvas{
+    width:100%; height:100%;
+    display:block;
+    image-rendering:optimizeSpeed;
+  }
+
+  .screen{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    background: linear-gradient(180deg, rgba(12,10,24,0.92), rgba(12,10,24,0.97));
+    padding: 20px;
+    gap:14px;
+  }
+  .hidden{ display:none !important; }
+
+  h1.title{
+    font-size: clamp(18px, 4.2vw, 34px);
+    color:var(--mint);
+    text-shadow: 3px 3px 0 var(--magenta);
+    margin:0;
+  }
+  .subtitle{
+    color:var(--lavender);
+    font-size: clamp(10px, 1.6vw, 13px);
+    max-width:480px;
+    line-height:1.6;
+  }
+  .btn{
+    font-family:'Press Start 2P', monospace;
+    background:var(--magenta);
+    color:#fff;
+    border:none;
+    padding:12px 20px;
+    font-size: clamp(10px, 1.8vw, 13px);
+    border-radius:8px;
+    cursor:pointer;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.55);
+    transition: transform .08s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); }
+  .btn:active{ transform: translateY(2px); box-shadow:1px 1px 0 rgba(0,0,0,0.55); }
+  .btn.secondary{ background:var(--panel); color:var(--lavender); border:2px solid var(--lavender); box-shadow:4px 4px 0 rgba(0,0,0,0.4); }
+  .btn.mint{ background:var(--mint); color:#0c0a18; }
+  .btn-row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+
+  #level-grid{
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap:10px;
+    max-width:560px;
+  }
+  .lvl-btn{
+    font-family:'Press Start 2P', monospace;
+    width:88px; height:78px;
+    background:var(--panel);
+    border:2px solid var(--mint);
+    border-radius:10px;
+    color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer;
+    font-size:16px;
+    box-shadow:3px 3px 0 rgba(0,0,0,0.5);
+    gap:4px;
+  }
+  .lvl-btn .lvl-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:7px;
+    color:var(--lavender);
+    max-width:74px;
+    line-height:1.2;
+  }
+  .lvl-btn.locked{
+    background:#15101f; color:#5a5470; border-color:#3a3450; cursor:not-allowed;
+    box-shadow:none;
+  }
+  .lvl-btn:not(.locked):hover{ transform: translateY(-2px); }
+
+  #hud{
+    position:absolute; top:0; left:0; right:0;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:10px 14px;
+    pointer-events:none;
+    font-family:'Press Start 2P', monospace;
+    font-size: clamp(8px, 1.6vw, 11px);
+    color:var(--ink);
+    text-shadow:2px 2px 0 rgba(0,0,0,0.6);
+  }
+  #hud .pill{
+    background:rgba(20,15,40,0.65);
+    border:1px solid var(--lavender);
+    border-radius:8px;
+    padding:6px 10px;
+  }
+  #progress-wrap{
+    position:absolute; top:0; left:0; right:0;
+    height:6px; background:rgba(255,255,255,0.08);
+  }
+  #progress-bar{
+    height:100%; width:0%;
+    background: linear-gradient(90deg, var(--mint), var(--magenta));
+    transition: width .1s linear;
+  }
+
+  #speech-bubble{
+    position:absolute; top:42px; left:50%; transform:translateX(-50%);
+    background:#fff; color:#1a1330;
+    border-radius:12px;
+    padding:8px 14px;
+    font-size: clamp(9px, 1.6vw, 12px);
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    max-width: 76%;
+    text-align:center;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+    display:flex; align-items:center; gap:8px;
+    z-index:5;
+  }
+  #speech-bubble .face{
+    width:0; height:0;
+    border-left:9px solid transparent;
+    border-right:9px solid transparent;
+    border-bottom:16px solid var(--magenta);
+    flex-shrink:0;
+    position:relative;
+  }
+  #speech-bubble::after{
+    content:'';
+    position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
+    border-left:8px solid transparent; border-right:8px solid transparent;
+    border-top:8px solid #fff;
+  }
+
+  #banner{
+    position:absolute; top:38%; left:50%; transform:translate(-50%,-50%);
+    font-family:'Press Start 2P', monospace;
+    font-size: clamp(16px, 4vw, 30px);
+    color:var(--yellow);
+    text-shadow:3px 3px 0 rgba(0,0,0,0.6);
+    z-index:6;
+    pointer-events:none;
+    text-align:center;
+  }
+
+  #flash{
+    position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:7;
+  }
+
+  #mute-btn{
+    position:absolute; bottom:10px; right:10px;
+    width:36px; height:36px;
+    border-radius:50%;
+    border:2px solid var(--lavender);
+    background:rgba(20,15,40,0.7);
+    color:var(--ink);
+    font-size:16px;
+    cursor:pointer;
+    z-index:10;
+  }
+
+  .death-msg{
+    position:absolute; top:30%; left:50%; transform:translateX(-50%);
+    font-family:'Press Start 2P', monospace;
+    color:var(--magenta);
+    font-size: clamp(11px, 2.2vw, 15px);
+    text-shadow:2px 2px 0 rgba(0,0,0,0.6);
+    z-index:6; pointer-events:none;
+  }
+
+  .footer-note{
+    color:#5a5470;
+    font-size:9px;
+    margin-top:6px;
+  }
+
+  .credits{ color:#5a5470; font-size:8px; max-width:480px; line-height:1.5;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <canvas id="game" width="960" height="420"></canvas>
+
+    <div id="progress-wrap" class="hidden"><div id="progress-bar"></div></div>
+    <div id="hud" class="hidden">
+      <div class="pill" id="hud-level">LVL 1</div>
+      <div class="pill" id="hud-attempts">TRY #1</div>
+    </div>
+    <div id="speech-bubble" class="hidden"><span class="face"></span><span id="speech-text"></span></div>
+    <div id="banner" class="hidden"></div>
+    <div class="death-msg hidden" id="death-msg"></div>
+    <div id="flash"></div>
+
+    <div class="screen" id="screen-menu">
+      <h1 class="title pixel">PRISM RUSH</h1>
+      <div class="subtitle pixel" style="font-size:9px; color:var(--magenta);">THE TROLL GAUNTLET</div>
+      <p class="subtitle">Jump the spikes. Trust nothing past Level 3. The level has a sense of humor, and it is aimed at you.</p>
+      <div class="btn-row">
+        <button class="btn mint" id="btn-play">PLAY</button>
+        <button class="btn secondary" id="btn-howto">HOW TO PLAY</button>
+      </div>
+      <div class="credits">Tap / Click / Space / ↑ to jump. Original music &amp; art, made fresh for this game.</div>
+    </div>
+
+    <div class="screen hidden" id="screen-howto">
+      <h1 class="title pixel" style="font-size:18px;">HOW TO PLAY</h1>
+      <p class="subtitle" style="max-width:520px;">
+        Your cube runs automatically. Press <b>Space</b>, <b>↑</b>, click, or tap to jump over spikes and blocks.
+        Reach the flag to finish a level. Levels 1–2 are honest. From Level 3 onward... good luck.
+      </p>
+      <div class="btn-row">
+        <button class="btn secondary" id="btn-howto-back">BACK</button>
+      </div>
+    </div>
+
+    <div class="screen hidden" id="screen-levels">
+      <h1 class="title pixel" style="font-size:18px;">SELECT LEVEL</h1>
+      <div id="level-grid"></div>
+      <div class="btn-row">
+        <button class="btn secondary" id="btn-levels-back">BACK</button>
+      </div>
+    </div>
+
+    <div class="screen hidden" id="screen-pause">
+      <h1 class="title pixel" style="font-size:20px;">PAUSED</h1>
+      <div class="btn-row">
+        <button class="btn mint" id="btn-resume">RESUME</button>
+        <button class="btn secondary" id="btn-restart">RESTART</button>
+        <button class="btn secondary" id="btn-pause-quit">LEVEL SELECT</button>
+      </div>
+    </div>
+
+    <div class="screen hidden" id="screen-complete">
+      <h1 class="title pixel" id="complete-title" style="font-size:20px; color:var(--mint);">LEVEL CLEAR!</h1>
+      <p class="subtitle" id="complete-sub"></p>
+      <div class="btn-row">
+        <button class="btn mint" id="btn-next-level">NEXT LEVEL</button>
+        <button class="btn secondary" id="btn-complete-levels">LEVEL SELECT</button>
+      </div>
+    </div>
+
+    <div class="screen hidden" id="screen-finale">
+      <h1 class="title pixel" style="font-size:22px; color:var(--yellow);">YOU DID IT!</h1>
+      <p class="subtitle">All 10 levels. Every spike, every fake-out, every cruel little joke. You earned this.</p>
+      <div class="btn-row">
+        <button class="btn mint" id="btn-finale-levels">LEVEL SELECT</button>
+        <button class="btn secondary" id="btn-finale-replay">REPLAY LEVEL 1</button>
+      </div>
+    </div>
+
+    <button id="mute-btn" class="pixel" title="Mute music">🔊</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================== AUDIO ENGINE ==============================
+   Fully synthesized, original chiptune-style music & sound effects using the
+   Web Audio API. No samples, no recordings — every note is generated here.
+============================================================================ */
+const SCALES = {
+  bright:  [261.63,293.66,329.63,392.00,440.00,523.25],   // C D E G A C  - cheerful pentatonic
+  curious: [277.18,311.13,349.23,392.00,466.16,554.37],   // slightly off-kilter, playful
+  wobble:  [246.94,277.18,311.13,370.00,415.30,493.88],   // B-based, goofy/uneasy
+  chaos:   [233.08,261.63,277.18,329.63,349.23,415.30],   // denser, more dissonant
+  finale:  [261.63,329.63,392.00,440.00,523.25,587.33],   // triumphant major run
+};
+const LEVEL_MUSIC = [
+  {scale:'bright',  tempo:260, pattern:[0,2,4,2,5,4,2,0]},
+  {scale:'bright',  tempo:235, pattern:[0,2,4,5,4,2,4,5]},
+  {scale:'curious', tempo:225, pattern:[0,3,1,4,2,5,1,3]},
+  {scale:'curious', tempo:215, pattern:[5,3,1,0,1,3,5,4]},
+  {scale:'wobble',  tempo:205, pattern:[0,1,3,2,4,3,5,2]},
+  {scale:'wobble',  tempo:195, pattern:[2,4,1,5,0,3,2,5]},
+  {scale:'chaos',   tempo:185, pattern:[0,2,5,1,4,2,0,3]},
+  {scale:'chaos',   tempo:175, pattern:[4,1,3,0,5,2,4,1]},
+  {scale:'chaos',   tempo:165, pattern:[0,3,2,5,1,4,3,0]},
+  {scale:'finale',  tempo:170, pattern:[0,2,4,3,5,4,2,5]},
+];
+
+class AudioEngine{
+  constructor(){
+    this.ctx = null;
+    this.master = null;
+    this.muted = false;
+    this.loopTimer = null;
+  }
+  ensure(){
+    if(!this.ctx){
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = this.muted ? 0 : 0.22;
+      this.master.connect(this.ctx.destination);
+    }
+    if(this.ctx.state === 'suspended') this.ctx.resume();
+  }
+  toggleMute(){
+    this.ensure();
+    this.muted = !this.muted;
+    this.master.gain.value = this.muted ? 0 : 0.22;
+    return this.muted;
+  }
+  tone(freq, time, dur, type, vol){
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    osc.connect(gain);
+    gain.connect(this.master);
+    osc.start(time);
+    osc.stop(time + dur + 0.03);
+  }
+  startLevelLoop(idx){
+    this.ensure();
+    this.stopLoop();
+    const cfg = LEVEL_MUSIC[idx % LEVEL_MUSIC.length];
+    const scale = SCALES[cfg.scale];
+    let step = 0;
+    const stepDur = cfg.tempo / 1000;
+    const playStep = () => {
+      if(!this.ctx) return;
+      const t = this.ctx.currentTime + 0.02;
+      const noteIdx = cfg.pattern[step % cfg.pattern.length];
+      this.tone(scale[noteIdx], t, stepDur*0.85, 'square', 0.10);
+      if(step % 4 === 0){
+        this.tone(scale[0]/2, t, stepDur*0.7, 'triangle', 0.09);
+      }
+      if(step % 8 === 6){
+        this.tone(scale[(noteIdx+2)%scale.length]*2, t, stepDur*0.4, 'square', 0.05);
+      }
+      step++;
+    };
+    playStep();
+    this.loopTimer = setInterval(playStep, cfg.tempo);
+  }
+  stopLoop(){
+    if(this.loopTimer){ clearInterval(this.loopTimer); this.loopTimer = null; }
+  }
+  sfxJump(){
+    this.ensure();
+    const t = this.ctx.currentTime;
+    this.tone(740, t, 0.09, 'square', 0.16);
+    this.tone(1180, t+0.03, 0.07, 'square', 0.12);
+  }
+  sfxDeath(){
+    this.ensure();
+    const t = this.ctx.currentTime;
+    [520,420,320,220].forEach((f,i)=> this.tone(f, t+i*0.06, 0.12, 'sawtooth', 0.14));
+  }
+  sfxWin(){
+    this.ensure();
+    const t = this.ctx.currentTime;
+    [392,440,523.25,659.25].forEach((f,i)=> this.tone(f, t+i*0.09, 0.22, 'triangle', 0.16));
+  }
+  sfxBlip(){
+    this.ensure();
+    const t = this.ctx.currentTime;
+    this.tone(880, t, 0.05, 'square', 0.08);
+    this.tone(660, t+0.06, 0.05, 'square', 0.08);
+  }
+  sfxFakeout(){
+    this.ensure();
+    const t = this.ctx.currentTime;
+    [659.25,587.33,523.25].forEach((f,i)=> this.tone(f, t+i*0.08, 0.15, 'square', 0.14));
+  }
+}
+const audio = new AudioEngine();
+
+/* ============================== LEVEL BUILDER ============================== */
+function levelBuilder(){
+  let cursor = 420;
+  const obstacles = [], taunts = [], gravityZones = [], speedZones = [];
+  let fakeFinish = null, countdownTrap = null;
+  let zoneStart = null, zoneMeta = null;
+
+  const api = {
+    spike(gap=260, opts={}){
+      cursor += gap;
+      obstacles.push(Object.assign({x:cursor, w:30, h:32, type:'spike'}, opts));
+      return api;
+    },
+    spikeRow(n, gap=260, spacing=42, opts={}){
+      cursor += gap;
+      for(let i=0;i<n;i++) obstacles.push(Object.assign({x:cursor+i*spacing, w:28, h:30, type:'spike'}, opts));
+      cursor += spacing*(n-1);
+      return api;
+    },
+    decoy(gap=260){ return api.spike(gap, {safe:true}); },
+    decoyRow(n, gap=260, spacing=42){ return api.spikeRow(n, gap, spacing, {safe:true}); },
+    block(gap=260, h=46){
+      cursor += gap;
+      obstacles.push({x:cursor, w:38, h, type:'block'});
+      return api;
+    },
+    taunt(text, gap=220){
+      cursor += gap;
+      taunts.push({x:cursor, text});
+      return api;
+    },
+    pad(gap){ cursor += gap; return api; },
+    beginGravity(gap=320){ cursor += gap; zoneStart = cursor; return api; },
+    endGravity(pad=320){ gravityZones.push({from:zoneStart, to:cursor}); zoneStart=null; cursor += pad; return api; },
+    beginSpeed(mult, label, gap=320){ cursor += gap; zoneStart = cursor; zoneMeta = {mult, label}; return api; },
+    endSpeed(pad=320){ speedZones.push({from:zoneStart, to:cursor, mult:zoneMeta.mult, label:zoneMeta.label}); zoneStart=null; cursor += pad; return api; },
+    fakeFinishLine(gap=380){ cursor += gap; fakeFinish = {x:cursor}; cursor += 140; return api; },
+    countdownTrapHere(gap=380){ cursor += gap; countdownTrap = {x:cursor}; cursor += 80; return api; },
+    finish(gap=460){
+      cursor += gap;
+      return {obstacles, taunts, gravityZones, speedZones, fakeFinish, countdownTrap, finishX:cursor};
+    }
+  };
+  return api;
+}
+
+function buildLevel1(){
+  return levelBuilder()
+    .spike(280).spike(300)
+    .spikeRow(2,300,42)
+    .spike(280)
+    .block(300,42)
+    .spikeRow(2,280,42)
+    .spike(260)
+    .finish(460);
+}
+function buildLevel2(){
+  return levelBuilder()
+    .spike(260).spikeRow(2,280,40)
+    .block(300,46)
+    .spikeRow(3,300,38)
+    .spike(260)
+    .block(280,46)
+    .spikeRow(2,260,40)
+    .spike(280)
+    .spikeRow(2,260,40)
+    .finish(460);
+}
+function buildLevel3(){
+  return levelBuilder()
+    .taunt("Some of these spikes are all bark, no bite.", 260)
+    .spike(260)
+    .decoy(300)
+    .spike(280)
+    .decoyRow(2,280,42)
+    .spike(260)
+    .block(280,46)
+    .decoy(280)
+    .spikeRow(2,260,40)
+    .taunt("Still trusting your eyes? Cute.", 320)
+    .decoy(260)
+    .spike(280)
+    .finish(460);
+}
+function buildLevel4(){
+  return levelBuilder()
+    .spike(260).spikeRow(2,280,40)
+    .taunt("Brace yourself. Down is about to get... flexible.", 280)
+    .beginGravity(300)
+      .spike(260)
+      .spikeRow(2,280,40)
+      .spike(260)
+    .endGravity(280)
+    .taunt("Welcome back to normal. Enjoy it while it lasts.", 240)
+    .decoy(260)
+    .spikeRow(2,260,40)
+    .spike(280)
+    .finish(460);
+}
+function buildLevel5(){
+  return levelBuilder()
+    .spike(260).decoy(280).spikeRow(2,280,40)
+    .block(280,46)
+    .taunt("Almost there! ...allegedly.", 260)
+    .fakeFinishLine(320)
+    .spike(280)
+    .decoyRow(2,280,40)
+    .spike(260)
+    .spikeRow(2,260,40)
+    .block(280,46)
+    .finish(460);
+}
+function buildLevel6(){
+  return levelBuilder()
+    .spike(260).spikeRow(2,280,40)
+    .taunt("The level's pace is... emotionally unstable.", 260)
+    .beginSpeed(0.55,"SLOOOOW MOTION",300)
+      .spike(240)
+      .spikeRow(2,240,38)
+    .endSpeed(280)
+    .beginSpeed(1.55,"SPEED UP!!",300)
+      .spike(300)
+      .decoy(280)
+    .endSpeed(280)
+    .spikeRow(2,260,40)
+    .block(280,46)
+    .decoy(260)
+    .finish(460);
+}
+function buildLevel7(){
+  return levelBuilder()
+    .taunt("Things might look a little wobbly. You're still you.", 240)
+    .spike(260).decoyRow(2,260,40)
+    .beginGravity(300)
+      .spike(260)
+      .decoy(260)
+      .spikeRow(2,260,40)
+    .endGravity(280)
+    .block(280,46)
+    .spike(260)
+    .decoy(260)
+    .spikeRow(2,260,40)
+    .finish(460);
+}
+function buildLevel8(){
+  return levelBuilder()
+    .taunt("Everything. All at once. All having opinions.", 240)
+    .decoy(260).spike(260)
+    .beginSpeed(1.5,"HERE WE GO!",300)
+      .spikeRow(2,260,38)
+      .decoy(260)
+    .endSpeed(260)
+    .beginGravity(280)
+      .spike(260)
+      .spikeRow(2,260,40)
+      .decoy(260)
+    .endGravity(280)
+    .block(280,46)
+    .beginSpeed(0.6,"...and slow down.",280)
+      .decoyRow(2,260,40)
+      .spike(260)
+    .endSpeed(280)
+    .spikeRow(2,260,40)
+    .finish(460);
+}
+function buildLevel9(){
+  return levelBuilder()
+    .taunt("There may be a countdown ahead. It is lying.", 240)
+    .spike(260).decoy(260).spikeRow(2,260,40)
+    .countdownTrapHere(320)
+    .beginGravity(280)
+      .spikeRow(2,260,40)
+      .decoy(260)
+      .spike(260)
+    .endGravity(280)
+    .block(280,46)
+    .decoyRow(2,260,40)
+    .spike(260)
+    .beginSpeed(1.5,"NO TIME TO THINK!",260)
+      .spikeRow(2,260,38)
+    .endSpeed(280)
+    .finish(460);
+}
+function buildLevel10(){
+  return levelBuilder()
+    .taunt("Everything you've learned. One last time.", 240)
+    .spike(260).decoy(260).spikeRow(2,260,40)
+    .beginGravity(280)
+      .spike(260)
+      .decoyRow(2,260,40)
+    .endGravity(280)
+    .block(280,46)
+    .beginSpeed(1.5,"FINAL STRETCH!",260)
+      .spikeRow(2,260,38)
+      .decoy(260)
+    .endSpeed(280)
+    .taunt("One more little joke, we promise.", 260)
+    .fakeFinishLine(320)
+    .spike(260)
+    .decoyRow(2,260,40)
+    .spikeRow(2,260,38)
+    .finish(480);
+}
+
+const LEVELS = [
+  {id:1, title:"Warm-Up Wiggle",            speed:320, musicIdx:0, build:buildLevel1,  wobble:false, tip:"Tap / Space / Click to jump. Simple as that... for now."},
+  {id:2, title:"Getting Spicy",             speed:340, musicIdx:1, build:buildLevel2,  wobble:false, tip:"Twin spikes ahead — one good jump clears both."},
+  {id:3, title:"Trust Issues",              speed:355, musicIdx:2, build:buildLevel3,  wobble:false, tip:"Heads up: not every spike here is real."},
+  {id:4, title:"Upside Down Day",           speed:370, musicIdx:2, build:buildLevel4,  wobble:false, tip:"Gravity has opinions today."},
+  {id:5, title:"Gotcha!",                   speed:385, musicIdx:3, build:buildLevel5,  wobble:false, tip:"That finish line looks suspiciously close."},
+  {id:6, title:"Mood Swings",               speed:400, musicIdx:4, build:buildLevel6,  wobble:false, tip:"The level's pace cannot be trusted."},
+  {id:7, title:"Plot Twist",                speed:415, musicIdx:5, build:buildLevel7,  wobble:true,  tip:"Things might look a little wobbly."},
+  {id:8, title:"Chaos Theory",              speed:435, musicIdx:6, build:buildLevel8,  wobble:true,  tip:"Everything, all at once."},
+  {id:9, title:"Self-Destruct Prank",       speed:455, musicIdx:7, build:buildLevel9,  wobble:true,  tip:"Beware the lying countdown."},
+  {id:10,title:"Grand Finale (No Tricks. Maybe.)", speed:480, musicIdx:9, build:buildLevel10, wobble:true, tip:"Everything you've learned. One last time."},
+];
+
+/* ============================== GAME ENGINE ============================== */
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const GROUND_Y = H - 70;
+const CEIL_Y = 40;
+const PLAYER_SIZE = 32;
+const PLAYER_SCREEN_X = 140;
+const GRAVITY = 2100;
+const JUMP_VELOCITY = -780;
+
+const DEATH_LINES_EARLY = ["Try again!", "So close!", "Nice attempt!"];
+const DEATH_LINES_LATE = ["Skill issue?", "10/10 attempt.", "The spike says hi.", "Almost... not.", "Did you mean to do that?", "Plot twist: you lost.", "That spike was 100% real."];
+
+let state = 'menu'; // menu, howto, levels, playing, paused, complete, finale
+let unlockedLevel = 1;
+let currentLevelIdx = 0;
+let levelData = null;
+let attempts = 1;
+
+let player, cameraOffset, lastTime, rafId;
+let particles = [];
+let confetti = [];
+let triggeredFake = false, triggeredCountdown = false;
+let fakeOverlayTimer = 0, countdownTimer = 0, countdownStep = 0;
+let bannerTimer = 0, bannerText = '';
+let speechTimer = 0;
+let lastSpeedLabel = '';
+let inputLocked = false; // true while a scripted sequence (fake finish / countdown) is playing
+let finished = false, dead = false, deadTimer = 0;
+let jumpBufferedAt = -999, lastGroundedAt = -999;
+
+function resetPlayer(){
+  player = {x:PLAYER_SCREEN_X, y:GROUND_Y-PLAYER_SIZE, vy:0, onGround:true, rot:0, gravDir:1};
+  cameraOffset = 0;
+  particles = [];
+  confetti = [];
+  triggeredFake = false;
+  triggeredCountdown = false;
+  fakeOverlayTimer = 0;
+  countdownTimer = 0;
+  countdownStep = 0;
+  bannerTimer = 0;
+  speechTimer = 0;
+  lastSpeedLabel = '';
+  inputLocked = false;
+  finished = false;
+  dead = false;
+  deadTimer = 0;
+  jumpBufferedAt = -999;
+  lastGroundedAt = -999;
+}
+
+function setScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  if(id) document.getElementById(id).classList.remove('hidden');
+}
+
+function buildLevelGrid(){
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = '';
+  LEVELS.forEach((lvl, i)=>{
+    const btn = document.createElement('button');
+    const locked = lvl.id > unlockedLevel;
+    btn.className = 'lvl-btn' + (locked ? ' locked' : '');
+    btn.innerHTML = locked
+      ? `🔒<div class="lvl-name">LOCKED</div>`
+      : `${lvl.id}<div class="lvl-name">${lvl.title}</div>`;
+    if(!locked){
+      btn.addEventListener('click', ()=> startLevel(i));
+    }
+    grid.appendChild(btn);
+  });
+}
+
+function startLevel(idx){
+  currentLevelIdx = idx;
+  levelData = LEVELS[idx].build();
+  attempts = 1;
+  resetPlayer();
+  state = 'playing';
+  setScreen(null);
+  document.getElementById('hud').classList.remove('hidden');
+  document.getElementById('progress-wrap').classList.remove('hidden');
+  updateHud();
+  audio.startLevelLoop(LEVELS[idx].musicIdx);
+  showSpeech(LEVELS[idx].tip, 3200);
+  lastTime = performance.now();
+  if(rafId) cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(loop);
+}
+
+function retryLevel(){
+  attempts++;
+  resetPlayer();
+  updateHud();
+  audio.startLevelLoop(LEVELS[currentLevelIdx].musicIdx);
+}
+
+function updateHud(){
+  document.getElementById('hud-level').textContent = `LVL ${LEVELS[currentLevelIdx].id}`;
+  document.getElementById('hud-attempts').textContent = `TRY #${attempts}`;
+}
+
+function showSpeech(text, dur){
+  const el = document.getElementById('speech-bubble');
+  document.getElementById('speech-text').textContent = text;
+  el.classList.remove('hidden');
+  speechTimer = dur;
+}
+
+function showBanner(text, dur){
+  bannerText = text;
+  bannerTimer = dur;
+}
+
+function flashScreen(){
+  const f = document.getElementById('flash');
+  f.style.transition = 'none';
+  f.style.opacity = '0.85';
+  requestAnimationFrame(()=>{
+    f.style.transition = 'opacity .4s ease';
+    f.style.opacity = '0';
+  });
+}
+
+function jump(){
+  if(state !== 'playing' || inputLocked) return;
+  const now = performance.now();
+  if(player.onGround || (now - lastGroundedAt) < 90){
+    doJump();
+  } else {
+    jumpBufferedAt = now;
+  }
+}
+function doJump(){
+  player.vy = JUMP_VELOCITY * player.gravDir;
+  player.onGround = false;
+  audio.sfxJump();
+}
+
+function spawnDeathParticles(px,py){
+  for(let i=0;i<14;i++){
+    const ang = Math.random()*Math.PI*2;
+    const spd = 80 + Math.random()*220;
+    particles.push({
+      x:px, y:py,
+      vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd,
+      life: 0.5 + Math.random()*0.3,
+      color: Math.random()<0.5 ? '#ff2e88' : '#4bffb0'
+    });
+  }
+}
+function spawnConfetti(n){
+  for(let i=0;i<n;i++){
+    confetti.push({
+      x: Math.random()*W, y: -20-Math.random()*100,
+      vx: (Math.random()-0.5)*60, vy: 120+Math.random()*140,
+      rot: Math.random()*Math.PI*2, vrot:(Math.random()-0.5)*6,
+      color: ['#ff2e88','#ffd400','#4bffb0','#c9b8ff'][Math.floor(Math.random()*4)],
+      life: 2 + Math.random()
+    });
+  }
+}
+
+function die(){
+  if(dead || finished) return;
+  dead = true;
+  deadTimer = 0.55;
+  audio.sfxDeath();
+  spawnDeathParticles(PLAYER_SCREEN_X+PLAYER_SIZE/2, player.y+PLAYER_SIZE/2);
+  const lines = LEVELS[currentLevelIdx].id <= 2 ? DEATH_LINES_EARLY : DEATH_LINES_LATE;
+  const msgEl = document.getElementById('death-msg');
+  msgEl.textContent = lines[Math.floor(Math.random()*lines.length)];
+  msgEl.classList.remove('hidden');
+}
+
+function completeLevel(){
+  finished = true;
+  audio.sfxWin();
+  audio.stopLoop();
+  spawnConfetti(70);
+  const isLast = LEVELS[currentLevelIdx].id === 10;
+  unlockedLevel = Math.max(unlockedLevel, LEVELS[currentLevelIdx].id + (isLast?0:1));
+  setTimeout(()=>{
+    document.getElementById('hud').classList.add('hidden');
+    document.getElementById('progress-wrap').classList.add('hidden');
+    document.getElementById('speech-bubble').classList.add('hidden');
+    if(isLast){
+      state = 'finale';
+      setScreen('screen-finale');
+    } else {
+      state = 'complete';
+      document.getElementById('complete-sub').textContent =
+        `"${LEVELS[currentLevelIdx].title}" cleared in ${attempts} attempt${attempts>1?'s':''}.`;
+      setScreen('screen-complete');
+    }
+  }, 1400);
+}
+
+function inAnyZone(zones, worldX){
+  for(const z of zones) if(worldX >= z.from && worldX <= z.to) return z;
+  return null;
+}
+
+function update(dt){
+  if(state !== 'playing') return;
+
+  if(speechTimer > 0){
+    speechTimer -= dt*1000;
+    if(speechTimer <= 0) document.getElementById('speech-bubble').classList.add('hidden');
+  }
+  if(bannerTimer > 0){
+    bannerTimer -= dt*1000;
+    const b = document.getElementById('banner');
+    if(bannerTimer > 0){ b.textContent = bannerText; b.classList.remove('hidden'); }
+    else b.classList.add('hidden');
+  }
+
+  // particles always update for visual continuity
+  particles.forEach(p=>{ p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=600*dt; p.life-=dt; });
+  particles = particles.filter(p=>p.life>0);
+  confetti.forEach(c=>{ c.x+=c.vx*dt; c.y+=c.vy*dt; c.rot+=c.vrot*dt; c.life-=dt; });
+  confetti = confetti.filter(c=>c.life>0);
+
+  if(dead){
+    deadTimer -= dt;
+    if(deadTimer <= 0){
+      document.getElementById('death-msg').classList.add('hidden');
+      retryLevel();
+    }
+    return;
+  }
+  if(finished) return;
+
+  // scripted sequences pause normal physics
+  if(fakeOverlayTimer > 0){
+    fakeOverlayTimer -= dt*1000;
+    if(fakeOverlayTimer <= 0){ inputLocked = false; document.getElementById('banner').classList.add('hidden'); }
+    return;
+  }
+  if(countdownTimer > 0){
+    countdownTimer -= dt*1000;
+    if(countdownTimer <= 0){
+      countdownStep++;
+      if(countdownStep <= 3){
+        showBanner(String(4-countdownStep), 650);
+        countdownTimer = 650;
+        audio.sfxBlip();
+      } else if(countdownStep === 4){
+        showBanner("BOOM? ...nah, just kidding!", 1100);
+        countdownTimer = 1100;
+        flashScreen();
+        audio.sfxFakeout();
+      } else {
+        inputLocked = false;
+        document.getElementById('banner').classList.add('hidden');
+      }
+    }
+    return;
+  }
+
+  const playerWorldX = cameraOffset + PLAYER_SCREEN_X;
+
+  // gravity zone check
+  const gz = inAnyZone(levelData.gravityZones, playerWorldX);
+  player.gravDir = gz ? -1 : 1;
+  const restY = player.gravDir === 1 ? GROUND_Y - PLAYER_SIZE : CEIL_Y;
+  const grav = GRAVITY * player.gravDir;
+
+  // speed zone check
+  const sz = inAnyZone(levelData.speedZones, playerWorldX);
+  let speed = LEVELS[currentLevelIdx].speed * (sz ? sz.mult : 1);
+  if(sz && sz.label !== lastSpeedLabel){
+    showBanner(sz.label, 1100);
+    lastSpeedLabel = sz.label;
+  } else if(!sz){
+    lastSpeedLabel = '';
+  }
+
+  cameraOffset += speed * dt;
+
+  // physics
+  player.vy += grav * dt;
+  player.y += player.vy * dt;
+
+  if(player.gravDir === 1){
+    if(player.y >= restY){ player.y = restY; player.vy = 0; player.onGround = true; lastGroundedAt = performance.now(); }
+    else player.onGround = false;
+  } else {
+    if(player.y <= restY){ player.y = restY; player.vy = 0; player.onGround = true; lastGroundedAt = performance.now(); }
+    else player.onGround = false;
+  }
+  player.rot = player.onGround ? 0 : player.rot + (player.gravDir===1? 1:-1)*dt*9;
+
+  // jump buffer
+  if(player.onGround && (performance.now() - jumpBufferedAt) < 160){
+    doJump();
+    jumpBufferedAt = -999;
+  }
+
+  // taunts
+  for(const t of levelData.taunts){
+    if(Math.abs(playerWorldX - t.x) < 8 && speechTimer <= 0){
+      showSpeech(t.text, 2600);
+    }
+  }
+
+  // fake finish
+  if(levelData.fakeFinish && !triggeredFake && playerWorldX >= levelData.fakeFinish.x){
+    triggeredFake = true;
+    inputLocked = true;
+    fakeOverlayTimer = 1500;
+    audio.sfxFakeout();
+    showBanner("LEVEL COMPLETE!", 850);
+    spawnConfetti(40);
+    setTimeout(()=>{ if(fakeOverlayTimer>0) showBanner("...just kidding. Keep going!", 700); }, 850);
+  }
+  // countdown trap
+  if(levelData.countdownTrap && !triggeredCountdown && playerWorldX >= levelData.countdownTrap.x){
+    triggeredCountdown = true;
+    inputLocked = true;
+    countdownStep = 0;
+    countdownTimer = 500;
+    showBanner("SELF-DESTRUCT IN...", 500);
+  }
+
+  // collisions
+  const margin = 5; // forgiving hitbox
+  const pl = {x:PLAYER_SCREEN_X+margin, y:player.y+margin, w:PLAYER_SIZE-margin*2, h:PLAYER_SIZE-margin*2};
+  for(const ob of levelData.obstacles){
+    const sx = ob.x - cameraOffset;
+    if(sx < -60 || sx > W+60) continue;
+    const ceiling = !!inAnyZone(levelData.gravityZones, ob.x);
+    const oy = ceiling ? CEIL_Y : GROUND_Y - ob.h;
+    if(pl.x < sx+ob.w && pl.x+pl.w > sx && pl.y < oy+ob.h && pl.y+pl.h > oy){
+      if(!ob.safe) die();
+    }
+  }
+
+  // finish
+  if(playerWorldX >= levelData.finishX){
+    completeLevel();
+  }
+}
+
+function drawBackground(){
+  ctx.fillStyle = '#0c0a18';
+  ctx.fillRect(0,0,W,H);
+  // distant grid
+  ctx.strokeStyle = 'rgba(201,184,255,0.06)';
+  ctx.lineWidth = 1;
+  const gridOffset = -(cameraOffset*0.3) % 40;
+  for(let x=gridOffset; x<W; x+=40){
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+  }
+  // ground & ceiling bars
+  ctx.fillStyle = '#1b1538';
+  ctx.fillRect(0, GROUND_Y, W, H-GROUND_Y);
+  ctx.fillStyle = 'rgba(75,255,176,0.5)';
+  ctx.fillRect(0, GROUND_Y, W, 3);
+
+  const inGravity = !!inAnyZone(levelData.gravityZones, cameraOffset+PLAYER_SCREEN_X);
+  if(inGravity){
+    ctx.fillStyle = 'rgba(255,46,136,0.18)';
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#1b1538';
+    ctx.fillRect(0,0,W,CEIL_Y);
+    ctx.fillStyle = 'rgba(255,46,136,0.6)';
+    ctx.fillRect(0, CEIL_Y-3, W, 3);
+  }
+}
+
+function drawObstacle(ob){
+  const sx = ob.x - cameraOffset;
+  if(sx < -60 || sx > W+60) return;
+  const ceiling = !!inAnyZone(levelData.gravityZones, ob.x);
+  const oy = ceiling ? CEIL_Y : GROUND_Y - ob.h;
+  if(ob.type === 'spike'){
+    ctx.fillStyle = '#ff2e88';
+    ctx.beginPath();
+    if(!ceiling){
+      ctx.moveTo(sx, oy+ob.h);
+      ctx.lineTo(sx+ob.w/2, oy);
+      ctx.lineTo(sx+ob.w, oy+ob.h);
+    } else {
+      ctx.moveTo(sx, oy);
+      ctx.lineTo(sx+ob.w/2, oy+ob.h);
+      ctx.lineTo(sx+ob.w, oy);
+    }
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    ctx.fillStyle = '#ffd400';
+    ctx.fillRect(sx, oy, ob.w, ob.h);
+  }
+}
+
+function drawFlag(worldX, color){
+  const sx = worldX - cameraOffset;
+  if(sx < -60 || sx > W+60) return;
+  ctx.fillStyle = '#c9b8ff';
+  ctx.fillRect(sx, GROUND_Y-90, 4, 90);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(sx+4, GROUND_Y-90);
+  ctx.lineTo(sx+34, GROUND_Y-78);
+  ctx.lineTo(sx+4, GROUND_Y-66);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawPlayer(){
+  ctx.save();
+  ctx.translate(PLAYER_SCREEN_X+PLAYER_SIZE/2, player.y+PLAYER_SIZE/2);
+  ctx.rotate(player.rot);
+  ctx.fillStyle = '#4bffb0';
+  ctx.fillRect(-PLAYER_SIZE/2, -PLAYER_SIZE/2, PLAYER_SIZE, PLAYER_SIZE);
+  ctx.strokeStyle = '#0c0a18';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(-PLAYER_SIZE/2, -PLAYER_SIZE/2, PLAYER_SIZE, PLAYER_SIZE);
+  ctx.restore();
+}
+
+function draw(){
+  ctx.save();
+  const lvl = LEVELS[currentLevelIdx];
+  if(lvl && lvl.wobble && state==='playing'){
+    const t = performance.now()/1000;
+    ctx.translate(W/2, H/2);
+    ctx.rotate(Math.sin(t*1.3)*0.012);
+    ctx.translate(-W/2, -H/2 + Math.sin(t*2.1)*3);
+  }
+  drawBackground();
+  if(levelData){
+    levelData.obstacles.forEach(drawObstacle);
+    if(levelData.fakeFinish) drawFlag(levelData.fakeFinish.x, '#ffd400');
+    drawFlag(levelData.finishX, '#4bffb0');
+  }
+  if(!dead && !finished) drawPlayer();
+
+  particles.forEach(p=>{
+    ctx.globalAlpha = Math.max(p.life,0)/0.8;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, 5, 5);
+  });
+  ctx.globalAlpha = 1;
+  confetti.forEach(c=>{
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.rot);
+    ctx.fillStyle = c.color;
+    ctx.fillRect(-4,-6,8,12);
+    ctx.restore();
+  });
+  ctx.restore();
+
+  if(levelData && state==='playing'){
+    const pct = Math.min(100, (cameraOffset+PLAYER_SCREEN_X)/levelData.finishX*100);
+    document.getElementById('progress-bar').style.width = pct+'%';
+  }
+}
+
+function loop(now){
+  rafId = requestAnimationFrame(loop);
+  let dt = (now - lastTime)/1000;
+  lastTime = now;
+  dt = Math.min(dt, 0.033);
+  update(dt);
+  draw();
+}
+
+/* ============================== INPUT ============================== */
+window.addEventListener('keydown', (e)=>{
+  if(e.code === 'Space' || e.code === 'ArrowUp'){
+    e.preventDefault();
+    jump();
+  } else if(e.code === 'Escape'){
+    togglePause();
+  }
+});
+canvas.addEventListener('mousedown', jump);
+canvas.addEventListener('touchstart', (e)=>{ e.preventDefault(); jump(); }, {passive:false});
+
+function togglePause(){
+  if(state === 'playing'){
+    state = 'paused';
+    audio.master && (audio.master.gain.value = audio.muted?0:0.0001);
+    setScreen('screen-pause');
+  } else if(state === 'paused'){
+    state = 'playing';
+    audio.master && (audio.master.gain.value = audio.muted?0:0.22);
+    setScreen(null);
+  }
+}
+
+/* ============================== UI WIRING ============================== */
+document.getElementById('btn-play').addEventListener('click', ()=>{
+  buildLevelGrid();
+  setScreen('screen-levels');
+});
+document.getElementById('btn-howto').addEventListener('click', ()=> setScreen('screen-howto'));
+document.getElementById('btn-howto-back').addEventListener('click', ()=> setScreen('screen-menu'));
+document.getElementById('btn-levels-back').addEventListener('click', ()=> setScreen('screen-menu'));
+
+document.getElementById('btn-resume').addEventListener('click', togglePause);
+document.getElementById('btn-restart').addEventListener('click', ()=>{
+  state = 'playing';
+  audio.master.gain.value = audio.muted?0:0.22;
+  setScreen(null);
+  attempts = 1;
+  resetPlayer();
+  updateHud();
+  audio.startLevelLoop(LEVELS[currentLevelIdx].musicIdx);
+});
+document.getElementById('btn-pause-quit').addEventListener('click', ()=>{
+  state = 'levels';
+  audio.stopLoop();
+  document.getElementById('hud').classList.add('hidden');
+  document.getElementById('progress-wrap').classList.add('hidden');
+  document.getElementById('speech-bubble').classList.add('hidden');
+  buildLevelGrid();
+  setScreen('screen-levels');
+});
+
+document.getElementById('btn-next-level').addEventListener('click', ()=>{
+  const next = Math.min(currentLevelIdx+1, LEVELS.length-1);
+  startLevel(next);
+});
+document.getElementById('btn-complete-levels').addEventListener('click', ()=>{
+  state = 'levels';
+  buildLevelGrid();
+  setScreen('screen-levels');
+});
+document.getElementById('btn-finale-levels').addEventListener('click', ()=>{
+  state = 'levels';
+  buildLevelGrid();
+  setScreen('screen-levels');
+});
+document.getElementById('btn-finale-replay').addEventListener('click', ()=> startLevel(0));
+
+document.getElementById('mute-btn').addEventListener('click', (e)=>{
+  const muted = audio.toggleMute();
+  e.target.textContent = muted ? '🔇' : '🔊';
+});
+
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden && state==='playing') togglePause();
+});
+
+})();
+</script>
+</body>
+</html>

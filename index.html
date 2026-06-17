@@ -711,7 +711,8 @@
                 'nuke': { label: "Follow the forbidden desktop trail to its explosive end", done: false },
                 'calc_42': { label: "Calculate the answer to life, the universe, and everything", done: false },
                 'konami': { label: "Execute the ancient 10-button gamer ritual to invert gravity", done: false },
-                'matrix': { label: "Command the terminal to wake you up", done: false }
+                'matrix': { label: "Command the terminal to wake you up", done: false },
+                'prismrush': { label: "Rage quit the Troll Gauntlet", done: false }
             },
             init: () => {
                 const saved = localStorage.getItem('doors_checklist');
@@ -770,7 +771,7 @@
             }
         };
 
-        const PinnedApps = ['copilot', 'browser', 'explorer', 'terminal', 'calc', 'settings', 'checklist'];
+        const PinnedApps = ['copilot', 'browser', 'explorer', 'terminal', 'calc', 'settings', 'checklist', 'prismrush'];
 
         // --- 1. VIRTUAL FILE SYSTEM ---
         window.Clipboard = null; // Global clipboard for Cut/Copy/Paste
@@ -834,6 +835,7 @@
                 { name: 'Settings', icon: '⚙️', type: 'app', target: 'settings' },
                 { name: 'Snake Game', icon: '🐍', type: 'app', target: 'snake' },
                 { name: 'Flappy Bird', icon: '🐦', type: 'app', target: 'flappybird' },
+                { name: 'Prism Rush', icon: '🔺', type: 'app', target: 'prismrush' },
                 { name: 'Notes.txt', icon: '📄', type: 'file', content: 'Welcome to the Doors 12 Web OS!\n\nTry exploring the apps, or try to find some of the hidden Easter Eggs.' },
                 { name: 'DO_NOT_READ.txt', icon: '🔒', type: 'file', content: 'I TOLD YOU NOT TO READ THIS.\n\nNow you must go on a quest.\n\nLook inside your "Downloads" folder for a file called TOP_SECRET.txt.\n\nDo NOT open it. I am warning you.' }
             ],
@@ -3298,6 +3300,19 @@
                     
                     send.onclick = handleSend;
                     input.onkeydown = (e) => { if(e.key === 'Enter') handleSend(); };
+                }
+            },
+            'prismrush': {
+                name: 'Prism Rush', icon: '🔺', width: 960, height: 480,
+                render: (id) => `
+                    <div class="app-prism" style="width:100%; height:100%; background:#000; overflow:hidden;">
+                        <iframe id="${id}-frame" src="PRISM RUSH.html" style="width:100%; height:100%; border:none; display:block;" allow="autoplay; fullscreen"></iframe>
+                    </div>
+                `,
+                init: (id) => {
+                    // The game is now cleanly loaded from the external HTML file!
+                    // Note: Your "PRISM RUSH.html" file already contains the code to trigger 
+                    // the "prismrush" achievement in the parent OS when the player dies.
                 }
             }
         };

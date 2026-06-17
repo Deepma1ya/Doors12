@@ -181,12 +181,12 @@
         /* ==========================================================================
            DESKTOP & WINDOW MANAGER
            ========================================================================== */
-        #desktop { position: absolute; top: 0; left: 0; right: 0; bottom: 48px; padding: 10px; display: grid; grid-template-columns: repeat(auto-fill, 84px); grid-template-rows: repeat(auto-fill, 96px); grid-auto-flow: column; gap: 4px; z-index: 10; }
-        .desktop-icon { width: 84px; height: 96px; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; padding: 8px 4px; cursor: default; transition: background 0.15s; border: 1px solid transparent; }
+        #desktop { position: absolute; top: 0; left: 0; right: 0; bottom: 48px; padding: 10px; display: grid; grid-template-columns: repeat(auto-fill, 84px); grid-template-rows: repeat(auto-fill, 104px); grid-auto-flow: column; gap: 4px; z-index: 10; }
+        .desktop-icon { width: 84px; height: 104px; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; padding: 8px 4px; cursor: default; transition: background 0.15s; border: 1px solid transparent; }
         .desktop-icon:hover { background: var(--hover-bg); }
         .desktop-icon.selected { background: var(--active-bg); border-color: var(--glass-border); }
-        .desktop-icon span { font-size: 38px; margin-bottom: 6px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
-        .desktop-icon p { font-size: 12px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.8); text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .desktop-icon span { font-size: 38px; line-height: 1; margin-bottom: 6px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
+        .desktop-icon p { font-size: 12px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.8); text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
 
         #window-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
         .sys-window { position: absolute; border-radius: var(--radius-lg); display: flex; flex-direction: column; overflow: hidden; background: var(--win-bg); border: 1px solid var(--glass-border); box-shadow: var(--shadow-lg); pointer-events: auto; transform: scale(0.95); opacity: 0; transition: transform 0.2s, opacity 0.2s; }
@@ -201,7 +201,7 @@
         .win-ctrl-btn { width: 46px; height: 100%; background: transparent; border: none; color: var(--text-main); font-size: 14px; transition: background 0.15s; }
         .win-ctrl-btn:hover { background: var(--hover-bg); }
         .win-ctrl-btn.close:hover { background: #e81123; color: white; }
-        .win-content { flex: 1; position: relative; background: var(--win-bg); display: flex; flex-direction: column; overflow: hidden; }
+        .win-content { flex: 1; position: relative; background: var(--win-bg); display: flex; flex-direction: column; overflow: hidden; transition: opacity 0.2s ease 0.1s; }
 
         /* Window Resize Handles */
         .win-resize-handle { position: absolute; z-index: 1000; display: block; }
@@ -281,6 +281,16 @@
         .exp-side-item:hover { background: var(--hover-bg); }
         .exp-grid { flex: 1; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); align-content: start; gap: 15px; overflow-y: auto; }
 
+        /* Explorer Drive Icons */
+        .drive-icon { display: flex; align-items: center; padding: 10px; border-radius: var(--radius-md); cursor: pointer; transition: background 0.15s; border: 1px solid transparent; gap: 15px; }
+        .drive-icon:hover { background: var(--hover-bg); }
+        .drive-icon.selected { background: var(--active-bg); border-color: var(--glass-border); }
+        .drive-icon .d-icon { font-size: 42px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); line-height: 1; }
+        .drive-icon .d-info { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .drive-icon .d-name { font-size: 13px; font-weight: 600; color: var(--text-main); }
+        .drive-icon .d-bar-bg { width: 100%; height: 14px; background: rgba(0,0,0,0.4); border-radius: 3px; border: 1px solid var(--glass-border); overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); }
+        .drive-icon .d-text { font-size: 12px; color: var(--text-secondary); }
+
         /* Easter Egg Toast */
         #toast { position: absolute; bottom: 80px; right: 20px; background: var(--accent); color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10000; transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.1,0.9,0.2,1); font-weight: 500;}
         #toast.show { transform: translateX(0); }
@@ -315,6 +325,18 @@
         /* Barrel Roll Animation */
         @keyframes barrelRollAnim { 0% { transform: rotate(0deg) scale(1); } 100% { transform: rotate(360deg) scale(1); } }
         .barrel-roll { animation: barrelRollAnim 1s ease-in-out !important; }
+
+        /* Custom Popup Animation */
+        @keyframes popup-pop-in {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
 
         /* Enhanced Transformer Glitch Animation */
         @keyframes cyberGlitch {
@@ -778,7 +800,7 @@
         
         // Global Rename Helper
         window.TriggerRename = (el, item, path, renderCallback) => {
-            const p = el.querySelector('p');
+            const p = el.querySelector('p') || el.querySelector('.d-name');
             const oldName = item.name;
             p.innerHTML = `<input type="text" value="${item.name}" style="width:100%; color:black; text-align:center; outline:none; border-radius:4px; padding:2px; font-size:12px;">`;
             const input = p.querySelector('input');
@@ -804,9 +826,9 @@
 
         const VFS = {
             'This PC': [
-                { name: 'Local Disk (C:)', icon: '💽', type: 'dir', target: 'C:' },
-                { name: 'Data (D:)', icon: '💽', type: 'dir', target: 'D:' },
-                { name: 'Backup (E:)', icon: '💽', type: 'dir', target: 'E:' }
+                { name: 'Local Disk (C:)', icon: '💽', type: 'dir', target: 'C:', usedText: '500 TB', totalText: '1 PB', percent: 50, color: 'var(--accent)' },
+                { name: 'Data (D:)', icon: '💽', type: 'dir', target: 'D:', usedText: '58 ZB', totalText: '89 ZB', percent: 65.2, color: 'var(--accent)' },
+                { name: 'Backup (E:)', icon: '💽', type: 'dir', target: 'E:', usedText: '65 ZB', totalText: '71 ZB', percent: 91.5, color: '#e81123' }
             ],
             'C:': [
                 { name: 'Desktop', icon: '🖥️', type: 'dir', target: 'C:/Desktop' },
@@ -816,7 +838,8 @@
             ],
             'D:': [
                 { name: 'Games', icon: '📁', type: 'dir', target: 'D:/Games' },
-                { name: 'Work Backups', icon: '📁', type: 'dir', target: 'D:/Work Backups' }
+                { name: 'Work Backups', icon: '📁', type: 'dir', target: 'D:/Work Backups' },
+                { name: 'Homework', icon: '📁', type: 'dir', target: 'D:/Homework' }
             ],
             'E:': [
                 { name: 'System Image.iso', icon: '💿', type: 'file', content: 'Encrypted System Backup.' }
@@ -824,6 +847,9 @@
             'D:/Games': [],
             'D:/Work Backups': [
                 { name: 'CONFIDENTIAL.txt', icon: '🔒', type: 'file', isLocked: true, password: 'ROSEBUD', content: 'You shouldn\'t have done that...' }
+            ],
+            'D:/Homework': [
+                { name: 'Homework.mp4', icon: '<img src="homework.png" style="width:42px; height:42px; object-fit:cover; border-radius:6px;">', type: 'locked_video_folder', thumbnail: 'homework.png', video: 'study.mp4' }
             ],
             'C:/Desktop': [
                 { name: 'OS Tour', icon: '☑️', type: 'app', target: 'checklist' },
@@ -2492,35 +2518,131 @@
                         grid.innerHTML = '';
                         const folder = VFS[path] || [];
                         
+                        grid.style.gridTemplateColumns = path === 'This PC' ? 'repeat(auto-fill, minmax(260px, 1fr))' : 'repeat(auto-fill, minmax(100px, 1fr))';
+
                         folder.forEach((item, index) => {
                             const el = document.createElement('div');
-                            el.className = 'desktop-icon';
-                            if (window.Clipboard && window.Clipboard.action === 'cut' && window.Clipboard.item.name === item.name && window.Clipboard.sourcePath === path) {
-                                el.classList.add('cut-item');
+                            
+                            if (path === 'This PC') {
+                                el.className = 'drive-icon';
+                                if (window.Clipboard && window.Clipboard.action === 'cut' && window.Clipboard.item.name === item.name && window.Clipboard.sourcePath === path) {
+                                    el.classList.add('cut-item');
+                                }
+                                el.innerHTML = `
+                                    <div class="d-icon">${item.icon}</div>
+                                    <div class="d-info">
+                                        <div class="d-name">${item.name}</div>
+                                        ${item.totalText ? `
+                                        <div class="d-bar-bg"><div class="d-bar-fg" style="background:${item.color || 'var(--accent)'}; width:0%; height:100%; transition: width 1s cubic-bezier(0.1, 0.9, 0.2, 1);"></div></div>
+                                        <div class="d-text">${item.usedText} used of ${item.totalText}</div>
+                                        ` : `<div class="d-text">System Folder</div>`}
+                                    </div>
+                                `;
+                                setTimeout(() => {
+                                    const bar = el.querySelector('.d-bar-fg');
+                                    if(bar) bar.style.width = item.percent + '%';
+                                }, 50);
+                            } else {
+                                el.className = 'desktop-icon';
+                                if (window.Clipboard && window.Clipboard.action === 'cut' && window.Clipboard.item.name === item.name && window.Clipboard.sourcePath === path) {
+                                    el.classList.add('cut-item');
+                                }
+                                el.innerHTML = `<span>${item.icon}</span><p style="color:var(--text-main);">${item.name}</p>`;
                             }
-                            el.innerHTML = `<span>${item.icon}</span><p style="color:var(--text-main);">${item.name}</p>`;
                             
                             const openItem = () => {
                                 if (item.type === 'app') WindowManager.launch(item.target);
                                 else if (item.type === 'file') WindowManager.launch('notepad', { title: item.name, content: item.content, isLocked: item.isLocked, password: item.password });
                                 else if (item.type === 'dir') renderFolder(item.target);
+                                else if (item.type === 'locked_video_folder') {
+                                    const promptId = 'pwd_prompt_' + Math.random().toString(36).substr(2, 9);
+                                    const promptHtml = `
+                                        <div id="${promptId}" style="position:absolute; inset:0; background:rgba(0,0,0,0.7); z-index:100; display:flex; flex-direction:column; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+                                            <div style="background:var(--win-bg); padding:20px; border-radius:12px; text-align:center; box-shadow:var(--shadow-lg);">
+                                                <img src="${item.thumbnail}" style="width:200px; height:auto; border-radius:8px; margin-bottom:15px; border:1px solid var(--glass-border);">
+                                                <h3 style="color:var(--text-main);">Password Required</h3>
+                                                <p style="color:var(--text-secondary); font-size:13px;">Enter password to open "${item.name}"</p>
+                                                <input type="password" id="${promptId}-input" style="padding:10px; border-radius:6px; border:1px solid var(--glass-border); background:var(--input-bg); color:white; margin:10px 0; text-align:center; width:200px; outline:none;" autofocus>
+                                                <p style="font-size: 12px; color: var(--text-secondary); margin-top: -5px; margin-bottom: 15px;">Hint: use the password you used to log in into DoorOs</p>
+                                                <button id="${promptId}-btn" style="padding:10px 24px; background:var(--accent); color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">Unlock</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                    const winContent = document.getElementById(id).querySelector('.win-content');
+                                    winContent.insertAdjacentHTML('beforeend', promptHtml);
+
+                                    const promptEl = document.getElementById(promptId);
+                                    const pwdInput = document.getElementById(`${promptId}-input`);
+                                    const unlockBtn = document.getElementById(`${promptId}-btn`);
+
+                                    const handleUnlock = () => {
+                                        if (pwdInput.value === window.sessionPassword) {
+                                            promptEl.remove();
+                                            const popups = ["do you want to open this?", "do you REALLY want to open this ?", "there is nothing here", "It is not the study time", "it has some hard maths", "you wont listen ?", "ok fine I will open the file"];
+                                            let currentPopup = 0;
+                                            const showNextPopup = () => {
+                                                if (currentPopup < popups.length) {
+                                                    const popupId = 'msg_prompt_' + Math.random().toString(36).substr(2, 9);
+                                                    // The modal window itself has the pop-in animation
+                                                    const popupHtml = `
+                                                        <div id="${popupId}" style="position:absolute; inset:0; background:rgba(0,0,0,0.4); z-index:100; display:flex; align-items:center; justify-content:center;">
+                                                            <div style="background:var(--win-bg); padding:20px 30px; border-radius:8px; border:1px solid var(--glass-border); box-shadow:var(--shadow-lg); text-align:center; min-width:250px; animation: popup-pop-in 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);">
+                                                                <div style="font-size:32px; margin-bottom:10px;">⚠️</div>
+                                                                <p style="color:var(--text-main); margin-bottom:20px; font-size:14px;">${popups[currentPopup]}</p>
+                                                                <button id="${popupId}-btn" style="padding:8px 24px; background:#555; color:white; border:none; border-radius:4px; cursor:not-allowed; font-weight:bold; transition: background 0.2s;" disabled>OK</button>
+                                                            </div>
+                                                        </div>
+                                                    `;
+                                                    winContent.insertAdjacentHTML('beforeend', popupHtml);
+                                                    const okBtn = document.getElementById(`${popupId}-btn`);
+
+                                                    // The button is greyed out and becomes clickable after 1.5 seconds
+                                                    setTimeout(() => {
+                                                        okBtn.disabled = false;
+                                                        okBtn.style.background = 'var(--accent)';
+                                                        okBtn.style.cursor = 'pointer';
+                                                    }, 1500);
+
+                                                    okBtn.onclick = () => {
+                                                        document.getElementById(popupId).remove();
+                                                        currentPopup++;
+                                                        showNextPopup();
+                                                    };
+                                                } else {
+                                                    WindowManager.launch('doorMediaPlayer', { videoSrc: item.video, title: item.name });
+                                                }
+                                            };
+                                            showNextPopup();
+                                        } else {
+                                            const inputGroup = pwdInput.parentElement;
+                                            inputGroup.classList.remove('shake-err');
+                                            void inputGroup.offsetWidth;
+                                            inputGroup.classList.add('shake-err');
+                                            EasterEggs.showToast("Incorrect Password!");
+                                            pwdInput.value = '';
+                                            pwdInput.focus();
+                                        }
+                                    };
+                                    unlockBtn.onclick = handleUnlock;
+                                    pwdInput.onkeydown = (e) => { if (e.key === 'Enter') handleUnlock(); };
+                                }
                             };
-                            el.ondblclick = openItem;
+                            el.ondblclick = () => openItem(el);
 
                             el.oncontextmenu = (e) => {
                                 e.preventDefault(); e.stopPropagation();
                                 ContextMenu.show(e.clientX, e.clientY, [
-                                    { label: 'Open', icon: '📂', action: openItem },
+                                    { label: 'Open', icon: '📂', action: () => openItem(el) },
                                     'divider',
                                     { label: 'Cut', icon: '✂️', action: () => {
                                         window.Clipboard = { action: 'cut', item: JSON.parse(JSON.stringify(item)), sourcePath: path };
-                                        document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('cut-item'));
+                                        document.querySelectorAll('.desktop-icon, .drive-icon').forEach(i => i.classList.remove('cut-item'));
                                         el.classList.add('cut-item');
                                         EasterEggs.showProgressToast(`Preparing to move ${item.name}...`, 600);
                                     }},
                                     { label: 'Copy', icon: '📋', action: () => {
                                         window.Clipboard = { action: 'copy', item: JSON.parse(JSON.stringify(item)), sourcePath: path };
-                                        document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('cut-item'));
+                                        document.querySelectorAll('.desktop-icon, .drive-icon').forEach(i => i.classList.remove('cut-item'));
                                         el.classList.add('copy-anim');
                                         setTimeout(() => el.classList.remove('copy-anim'), 400);
                                         EasterEggs.showProgressToast(`Copying ${item.name}...`, 600);
@@ -2557,7 +2679,7 @@
                                     VFS[path].push(newItem);
                                     VFS[newPath] = [];
                                     renderFolder(path);
-                                    const icons = grid.querySelectorAll('.desktop-icon');
+                                    const icons = grid.querySelectorAll('.desktop-icon, .drive-icon');
                                     if(icons.length > 0) window.TriggerRename(icons[icons.length - 1], newItem, path, () => { renderFolder(path); if(path==='C:/Desktop') System.renderDesktop(); });
                                 }},
                                 { label: 'New Text Document', icon: '📄', action: () => {
@@ -2567,7 +2689,7 @@
                                     let newItem = { name: name, icon: '📄', type: 'file', content: '' };
                                     VFS[path].push(newItem);
                                     renderFolder(path);
-                                    const icons = grid.querySelectorAll('.desktop-icon');
+                                    const icons = grid.querySelectorAll('.desktop-icon, .drive-icon');
                                     if(icons.length > 0) window.TriggerRename(icons[icons.length - 1], newItem, path, () => { renderFolder(path); if(path==='C:/Desktop') System.renderDesktop(); });
                                 }},
                                 'divider',
@@ -3314,13 +3436,29 @@
                     // Note: Your "PRISM RUSH.html" file already contains the code to trigger 
                     // the "prismrush" achievement in the parent OS when the player dies.
                 }
+            },
+            'doorMediaPlayer': {
+                name: 'DoorMediaPlayer', icon: '🎬', width: 800, height: 500,
+                render: (id) => `
+                    <div style="width:100%; height:100%; background:#000; display:flex; align-items:center; justify-content:center;">
+                        <video id="${id}-video" controls autoplay style="max-width:100%; max-height:100%; outline:none;"></video>
+                    </div>
+                `,
+                init: (id, state) => {
+                    if (state && state.videoSrc) {
+                        document.getElementById(`${id}-video`).src = state.videoSrc;
+                    }
+                    if (state && state.title) {
+                        document.getElementById(id).querySelector('.win-title').innerText = state.title;
+                    }
+                }
             }
         };
 
         // --- 3. WINDOW MANAGER ---
         const WindowManager = {
             z: 100,
-            launch: (appId, state = null) => {
+            launch: (appId, state = null, sourceElement = null) => {
                 const app = Apps[appId];
                 if (!app) return;
                 
@@ -3328,16 +3466,37 @@
                 
                 const winId = 'win_' + Math.random().toString(36).substr(2, 9);
                 const win = document.createElement('div');
-                win.className = 'sys-window active-focus';
+                win.className = 'sys-window';
                 win.id = winId;
                 win.dataset.appId = appId;
                 
-                // Position logic (cascade)
+                const finalWidth = app.width;
+                const finalHeight = app.height;
                 const offset = (document.querySelectorAll('.sys-window').length * 30) % 150;
-                win.style.width = app.width + 'px';
-                win.style.height = app.height + 'px';
-                win.style.left = (150 + offset) + 'px';
-                win.style.top = (100 + offset) + 'px';
+                const finalLeft = Math.max(0, (window.innerWidth - finalWidth) / 2 + offset - 75);
+                const finalTop = Math.max(0, (window.innerHeight - 48 - finalHeight) / 2);
+
+                win.style.width = finalWidth + 'px';
+                win.style.height = finalHeight + 'px';
+
+                if (sourceElement) {
+                    const sourceRect = sourceElement.getBoundingClientRect();
+                    const scaleX = sourceRect.width / finalWidth;
+                    const scaleY = sourceRect.height / finalHeight;
+                    const transX = (sourceRect.left + sourceRect.width / 2) - (finalLeft + finalWidth / 2);
+                    const transY = (sourceRect.top + sourceRect.height / 2) - (finalTop + finalHeight / 2);
+
+                    win.style.left = `${finalLeft}px`;
+                    win.style.top = `${finalTop}px`;
+                    win.style.transform = `translate(${transX}px, ${transY}px) scale(${scaleX}, ${scaleY})`;
+                    win.style.opacity = '0';
+                } else {
+                    win.style.left = `${finalLeft}px`;
+                    win.style.top = `${finalTop}px`;
+                    win.style.transform = 'scale(0.9)';
+                    win.style.opacity = '0';
+                }
+
                 win.style.zIndex = ++WindowManager.z;
 
                 win.innerHTML = `
@@ -3361,6 +3520,9 @@
                     </div>
                     <div class="win-content">${app.render(winId)}</div>
                 `;
+
+                const content = win.querySelector('.win-content');
+                if (content) content.style.opacity = '0';
 
                 // Focus event
                 win.addEventListener('mousedown', () => WindowManager.focus(winId));
@@ -3487,8 +3649,14 @@
                     const targetWinId = tbBtn.dataset.winId;
                     const targetWin = document.getElementById(targetWinId);
                     if (!targetWin) return;
-                    if (targetWin.style.opacity === '0') { targetWin.style.opacity = '1'; targetWin.style.pointerEvents = 'auto'; WindowManager.focus(targetWinId); }
-                    else if (targetWin.classList.contains('active-focus')) WindowManager.minimize(targetWinId);
+                    if (targetWin.style.opacity === '0') { // Is minimized
+                        targetWin.style.opacity = '1';
+                        targetWin.style.transform = 'none';
+                        targetWin.style.pointerEvents = 'auto';
+                        const content = targetWin.querySelector('.win-content');
+                        if (content) content.style.opacity = '1';
+                        WindowManager.focus(targetWinId);
+                    } else if (targetWin.classList.contains('active-focus')) WindowManager.minimize(targetWinId);
                     else WindowManager.focus(targetWinId);
                 };
 
@@ -3496,13 +3664,20 @@
                 if (app.init) app.init(winId, state);
 
                 // Animate In
-                requestAnimationFrame(() => win.classList.add('active-anim'));
+                requestAnimationFrame(() => {
+                    win.style.transform = 'none';
+                    win.style.opacity = '1';
+                    if (content) content.style.opacity = '1';
+                });
                 WindowManager.focus(winId);
             },
             close: (winId) => {
                 const win = document.getElementById(winId);
+                if (!win) return;
                 const appId = win.dataset.appId;
-                win.style.transform = 'scale(0.9)';
+                
+                // "Pop-out" and fade animation on close
+                win.style.transform = 'scale(1.05)';
                 win.style.opacity = '0';
                 
                 setTimeout(() => {
@@ -3510,28 +3685,48 @@
                     
                     // Taskbar cleanup
                     const remaining = Array.from(document.querySelectorAll(`.sys-window[data-app-id="${appId}"]`));
-                    const tbBtn = document.getElementById(`tb_app_${appId}`);
+                    const tbBtnToUpdate = document.getElementById(`tb_app_${appId}`);
                     
-                    if (remaining.length === 0) {
-                        tbBtn.classList.remove('running', 'active-focus');
-                        if (!PinnedApps.includes(appId)) {
-                            tbBtn.remove();
+                    if (tbBtnToUpdate) {
+                        if (remaining.length === 0) {
+                            tbBtnToUpdate.classList.remove('running', 'active-focus');
+                            if (!PinnedApps.includes(appId)) {
+                                tbBtnToUpdate.remove();
+                            } else {
+                                tbBtnToUpdate.onclick = () => WindowManager.launch(appId, null, tbBtnToUpdate); // Revert to launcher
+                            }
                         } else {
-                            tbBtn.onclick = () => WindowManager.launch(appId); // Revert to launcher
+                            // Point the taskbar button to the next available instance of this app
+                            tbBtnToUpdate.dataset.winId = remaining[remaining.length - 1].id;
                         }
-                    } else {
-                        // Point the taskbar button to the next available instance of this app
-                        tbBtn.dataset.winId = remaining[remaining.length - 1].id;
                     }
-                }, 200);
+                }, 300);
             },
             minimize: (winId) => {
                 const win = document.getElementById(winId);
+                if (!win || win.classList.contains('maximized')) return;
                 const appId = win.dataset.appId;
+                const tbBtn = document.getElementById(`tb_app_${appId}`);
+
+                win.querySelector('.win-content').style.opacity = '0';
+                win.querySelector('.win-content').style.transition = 'none';
+
+                if (tbBtn) {
+                    const winRect = win.getBoundingClientRect();
+                    const tbRect = tbBtn.getBoundingClientRect();
+                    const scaleX = tbRect.width / winRect.width;
+                    const scaleY = tbRect.height / winRect.height;
+                    const transX = (tbRect.left + tbRect.width / 2) - (winRect.left + winRect.width / 2);
+                    const transY = (tbRect.top + tbRect.height / 2) - (winRect.top + winRect.height / 2);
+                    win.style.transform = `translate(${transX}px, ${transY}px) scale(${scaleX}, ${scaleY})`;
+                } else {
+                    win.style.transform = 'scale(0.9)';
+                }
+                
                 win.style.opacity = '0';
                 win.style.pointerEvents = 'none';
-                const tbBtn = document.getElementById(`tb_app_${appId}`);
-                if(tbBtn && tbBtn.dataset.winId === winId) tbBtn.classList.remove('active-focus');
+                const tbBtnFocus = document.getElementById(`tb_app_${appId}`);
+                if(tbBtnFocus && tbBtnFocus.dataset.winId === winId) tbBtnFocus.classList.remove('active-focus');
             },
             maximize: (winId) => {
                 const win = document.getElementById(winId);
@@ -3551,7 +3746,7 @@
                 
                 const tbBtn = document.getElementById(`tb_app_${appId}`);
                 if (tbBtn) {
-                    tbBtn.classList.add('active-focus');
+                    if (win.style.opacity !== '0') tbBtn.classList.add('active-focus');
                     tbBtn.dataset.winId = winId; // Ensure taskbar targets the focused window
                 }
                 
@@ -3815,7 +4010,7 @@
                 sm.innerHTML = ''; // Ensure it is cleared before populating to avoid duplicates
                 Object.keys(Apps).forEach(key => {
                     if (key === 'bsod') return; // Hide System Crash from start menu
-                    sm.innerHTML += `<div class="sm-app" onclick="WindowManager.launch('${key}'); System.toggleStart()"><span>${Apps[key].icon}</span><p>${Apps[key].name}</p></div>`;
+                    sm.innerHTML += `<div class="sm-app" onclick="WindowManager.launch('${key}', null, this); System.toggleStart()"><span>${Apps[key].icon}</span><p>${Apps[key].name}</p></div>`;
                 });
                 
                 // Initialize Pinned Taskbar Apps
@@ -3898,6 +4093,7 @@
             login: () => {
                 const pwdInput = document.getElementById('logon-pwd');
                 const pwd = pwdInput.value.toLowerCase();
+                window.sessionPassword = pwdInput.value; // Store the exact password for other apps to use
                 const user = document.getElementById('logon-user').value.trim() || 'Guest User';
                 
                 if (!pwdInput.value) {
@@ -3972,7 +4168,7 @@
                     btn.className = 'tb-btn';
                     btn.id = `tb_app_${appId}`;
                     btn.innerHTML = Apps[appId].icon;
-                    btn.onclick = () => WindowManager.launch(appId);
+                    btn.onclick = () => WindowManager.launch(appId, null, btn);
                     tb.appendChild(btn);
                 });
 
@@ -4090,6 +4286,7 @@
                 document.getElementById('calendar-flyout').classList.toggle('visible');
                 document.getElementById('start-menu').classList.remove('visible');
                 document.getElementById('quick-settings-flyout').classList.remove('visible');
+                const wf = document.getElementById('weather-flyout'); if (wf) wf.classList.remove('visible');
             }
         };
 
@@ -4101,6 +4298,7 @@
                 document.getElementById('quick-settings-flyout').classList.toggle('visible');
                 document.getElementById('start-menu').classList.remove('visible');
                 document.getElementById('calendar-flyout').classList.remove('visible');
+                const wf = document.getElementById('weather-flyout'); if (wf) wf.classList.remove('visible');
             },
             toggleWifi: () => {
                 QuickSettings.wifi = !QuickSettings.wifi;

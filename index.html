@@ -203,6 +203,20 @@
         .win-ctrl-btn.close:hover { background: #e81123; color: white; }
         .win-content { flex: 1; position: relative; background: var(--win-bg); display: flex; flex-direction: column; overflow: hidden; }
 
+        /* Window Resize Handles */
+        .win-resize-handle { position: absolute; z-index: 1000; display: block; }
+        .win-resize-handle.n { top: 0; left: 0; width: 100%; height: 4px; cursor: n-resize; }
+        .win-resize-handle.s { bottom: 0; left: 0; width: 100%; height: 4px; cursor: s-resize; }
+        .win-resize-handle.e { top: 0; right: 0; width: 4px; height: 100%; cursor: e-resize; }
+        .win-resize-handle.w { top: 0; left: 0; width: 4px; height: 100%; cursor: w-resize; }
+        .win-resize-handle.ne { top: 0; right: 0; width: 8px; height: 8px; cursor: ne-resize; z-index: 1001; }
+        .win-resize-handle.nw { top: 0; left: 0; width: 8px; height: 8px; cursor: nw-resize; z-index: 1001; }
+        .win-resize-handle.se { bottom: 0; right: 0; width: 8px; height: 8px; cursor: se-resize; z-index: 1001; }
+        .win-resize-handle.sw { bottom: 0; left: 0; width: 8px; height: 8px; cursor: sw-resize; z-index: 1001; }
+
+        /* Desktop Selection Marquee */
+        .selection-box { position: fixed; background: rgba(0, 120, 215, 0.4); border: 1px solid rgba(0, 120, 215, 0.8); z-index: 50; pointer-events: none; }
+
         /* ==========================================================================
            TASKBAR & START MENU
            ========================================================================== */
@@ -293,6 +307,7 @@
 
         .sys-window { transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease, left 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), top 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), width 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), height 0.3s cubic-bezier(0.1, 0.9, 0.2, 1); }
         .sys-window.dragging { transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease; } /* Disables position transition while dragging */
+        .sys-window.resizing { transition: none !important; } /* Instant visual updates while resizing */
 
         @keyframes menuOpen { from { opacity: 0; transform: scale(0.95) translateY(-5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         #context-menu { animation: menuOpen 0.2s cubic-bezier(0.1, 0.9, 0.2, 1); transform-origin: top left; }
@@ -685,15 +700,18 @@
         // --- CHECKLIST MANAGER ---
         const Checklist = {
             tasks: {
-                'browser': { label: "Open the Web Browser", done: false },
-                'copilot': { label: "Consult the AI Copilot", done: false },
-                'theme': { label: "Customize the OS Theme", done: false },
-                'dino': { label: "Meet the prehistoric offline companion", done: false },
-                'speedtest': { label: "Push the network speed tester past its limit", done: false },
+                'browser': { label: "Locate the gateway to the world wide web", done: false },
+                'copilot': { label: "Seek guidance from the artificial mind", done: false },
+                'theme': { label: "Alter the fundamental fabric of reality (colors)", done: false },
+                'dino': { label: "Sever your connection to meet a prehistoric friend", done: false },
+                'speedtest': { label: "Push the network speed tester past its breaking point", done: false },
                 'rickroll': { label: "Find the legendary 2007 music video", done: false },
-                'dev_mode': { label: "Unlock Developer Mode via the system clock", done: false },
-                'barrel_roll': { label: "Perform an aviation maneuver in the browser", done: false },
-                'nuke': { label: "Complete the Desktop File Treasure Hunt", done: false }
+                'dev_mode': { label: "Agitate the fabric of time to unlock developer powers", done: false },
+                'barrel_roll': { label: "Command the browser to perform an aviation maneuver", done: false },
+                'nuke': { label: "Follow the forbidden desktop trail to its explosive end", done: false },
+                'calc_42': { label: "Calculate the answer to life, the universe, and everything", done: false },
+                'konami': { label: "Execute the ancient 10-button gamer ritual to invert gravity", done: false },
+                'matrix': { label: "Command the terminal to wake you up", done: false }
             },
             init: () => {
                 const saved = localStorage.getItem('doors_checklist');
@@ -984,374 +1002,710 @@
 
                     // --- EASTER EGG CUTSCENE OVERRIDE ---
                     if (state && state.isNukeCutscene) {
-                        urlInput.value = "LIVE: GLOBAL NEWS NETWORK";
+                        WindowManager.maximize(id); // Ensure it's fullscreen for precise cursor tracking
+                        urlInput.value = "os://home";
                         urlInput.disabled = true;
                         goBtn.disabled = true;
                         
-                        customPage.innerHTML = `<canvas id="${id}-nuke-canvas" style="width:100%; height:100%; display:block; background:#000;"></canvas>`;
-                        frame.style.display = 'none'; 
-                        customPage.style.display = 'block';
-                        
-                        const cvs = document.getElementById(`${id}-nuke-canvas`);
-                        const ctx = cvs.getContext('2d');
-                        
-                        // Setup Space Assets
-                        const stars = [];
-                        for(let i=0; i<300; i++) stars.push({x: Math.random(), y: Math.random(), s: Math.random()*2.0});
-                        
-                        // Setup Panic People
-                        const panicPeople = [];
-                        for(let i=0; i<40; i++) {
-                            panicPeople.push({
-                                x: Math.random() * 2000,
-                                y: 80 + Math.random() * 60,
-                                speed: (Math.random() * 4 + 4) * (Math.random() > 0.5 ? 1 : -1),
-                                color: `hsl(${Math.random()*360}, 40%, 15%)`,
-                                size: Math.random() * 0.4 + 0.6
-                            });
-                        }
+                        // 1. Show DoorSearch Home Page
+                        showCustom(`
+                            <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#ffffff; color:#333; font-family:'Segoe UI', Tahoma, sans-serif;">
+                                <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
+                                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 22V4c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v18"/><path d="M12 2v20"/><path d="M9 12v.01"/><path d="M15 12v.01"/>
+                                    </svg>
+                                    <h1 style="font-size:54px; font-weight:700; color:#444; letter-spacing:-1.5px; margin:0;"><span style="color:var(--accent);">Door</span>Search</h1>
+                                </div>
+                                <div style="position: relative; width: 90%; max-width: 650px; display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;">
+                                    <div style="display:flex; width: 100%; background: #fff; border: 1px solid #dfe1e5; border-radius: 24px; padding: 6px 8px 6px 20px; align-items:center; box-shadow: 0 1px 6px rgba(32,33,36,.28);">
+                                        <span style="font-size: 18px; color: #9aa0a6; margin-right: 10px;">🔍</span>
+                                        <input type="text" id="${id}-ds-input-nuke" placeholder="Search the web or type a URL..." disabled style="flex:1; background: transparent; border: none; outline: none; color: #202124; font-size: 16px; padding: 10px 0;">
+                                        <button id="${id}-ds-btn-nuke" style="background:var(--accent); color:white; border:none; padding:10px 24px; border-radius:18px; font-weight:bold; font-size:15px;">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
 
-                        let debris = [];
-                        function initDebris(cx, cy) {
-                            for(let i=0; i<90; i++) {
-                                debris.push({
-                                    x: cx, y: cy, 
-                                    vx: (Math.random()-0.5)*25, 
-                                    vy: (Math.random()-0.5)*25,
-                                    size: Math.random()*20 + 5, 
-                                    scale: 1, 
-                                    scaleSpeed: Math.random()*0.12 + 0.02,
-                                    rot: Math.random()*Math.PI*2, 
-                                    rotV: (Math.random()-0.5)*0.3
-                                });
-                            }
-                            // Massive Explosion Audio
-                            try {
-                                const actx = new (window.AudioContext || window.webkitAudioContext)();
-                                const osc = actx.createOscillator(); 
-                                const gain = actx.createGain();
-                                osc.type = 'sawtooth'; 
-                                osc.frequency.setValueAtTime(80, actx.currentTime);
-                                osc.frequency.exponentialRampToValueAtTime(1, actx.currentTime + 6.0);
-                                gain.gain.setValueAtTime(4, actx.currentTime); 
-                                gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 6.0);
-                                osc.connect(gain); gain.connect(actx.destination);
-                                osc.start(); osc.stop(actx.currentTime + 6.0);
+                        const cursor = document.getElementById('fake-cursor');
+                        cursor.style.display = 'block'; // Keep cursor visible
 
-                                // High pitch shatter
-                                const bufferSize = actx.sampleRate * 2;
-                                const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
-                                const data = buffer.getChannelData(0);
-                                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-                                const noise = actx.createBufferSource(); noise.buffer = buffer;
-                                const nFilter = actx.createBiquadFilter(); nFilter.type = 'highpass'; nFilter.frequency.value = 1000;
-                                const nGain = actx.createGain(); nGain.gain.setValueAtTime(2, actx.currentTime); nGain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 2.0);
-                                noise.connect(nFilter); nFilter.connect(nGain); nGain.connect(actx.destination);
-                                noise.start();
-                            } catch(e){}
-                        }
-
-                        let startTime = Date.now();
-                        let impacted = false;
-                        let flashAlpha = 0;
-                        let spaceAudioPlayed = false;
-                        window.bsodTriggered = false;
-
-                        // Start Intro Audio
-                        try {
-                            const actx = new (window.AudioContext || window.webkitAudioContext)();
-                            // Crowd Noise
-                            const bufferSize = actx.sampleRate * 2;
-                            const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
-                            const data = buffer.getChannelData(0);
-                            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-                            const noise = actx.createBufferSource(); noise.buffer = buffer; noise.loop = true;
-                            const filter = actx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 400;
-                            const gain = actx.createGain(); gain.gain.setValueAtTime(0.6, actx.currentTime); gain.gain.linearRampToValueAtTime(0, actx.currentTime + 10.0);
-                            noise.connect(filter); filter.connect(gain); gain.connect(actx.destination);
-                            noise.start(); noise.stop(actx.currentTime + 10.0);
+                        // 2. Automated Cursor Sequence
+                        setTimeout(() => {
+                            const inputEl = document.getElementById(`${id}-ds-input-nuke`);
+                            if(!inputEl) return;
+                            const rect = inputEl.getBoundingClientRect();
+                            cursor.style.left = (rect.left + 50) + 'px';
+                            cursor.style.top = (rect.top + 15) + 'px';
                             
-                            // Rocket Rumble
-                            const osc = actx.createOscillator(); const rGain = actx.createGain();
-                            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(80, actx.currentTime); osc.frequency.linearRampToValueAtTime(30, actx.currentTime + 10.0);
-                            rGain.gain.setValueAtTime(0.8, actx.currentTime); rGain.gain.linearRampToValueAtTime(0, actx.currentTime + 10.0);
-                            osc.connect(rGain); rGain.connect(actx.destination);
-                            osc.start(); osc.stop(actx.currentTime + 10.0);
-                        } catch(e){}
-
-                        // Drawing Helpers
-                        function drawEarth(ctx, cx, cy, r, t) {
-                            ctx.save(); 
-                            // Atmosphere glow
-                            const atmo = ctx.createRadialGradient(cx, cy, r*0.8, cx, cy, r*1.3);
-                            atmo.addColorStop(0, 'rgba(74, 163, 223, 0.8)');
-                            atmo.addColorStop(1, 'rgba(74, 163, 223, 0)');
-                            ctx.fillStyle = atmo;
-                            ctx.beginPath(); ctx.arc(cx, cy, r*1.3, 0, Math.PI*2); ctx.fill();
-
-                            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.clip();
-                            // Ocean 3D
-                            const ocean = ctx.createRadialGradient(cx-r*0.3, cy-r*0.3, r*0.1, cx, cy, r);
-                            ocean.addColorStop(0, '#4aa3df'); ocean.addColorStop(1, '#001a4d');
-                            ctx.fillStyle = ocean; ctx.fill();
-                            // Continents
-                            ctx.fillStyle = '#1e824c';
-                            ctx.beginPath(); ctx.arc(cx - r*0.2, cy - r*0.2, r*0.6, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.arc(cx + r*0.4, cy + r*0.3, r*0.5, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.ellipse(cx - r*0.5, cy + r*0.5, r*0.6, r*0.2, -Math.PI/4, 0, Math.PI*2); ctx.fill();
-                            // Earth Clouds
-                            ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                            let cloudOffset = (t * 0.005) % (r*2);
-                            ctx.beginPath(); ctx.arc(cx - r + cloudOffset, cy + r*0.1, r*0.3, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.arc(cx + r*0.3 - cloudOffset*0.5, cy - r*0.4, r*0.4, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.arc(cx - r*0.6 + cloudOffset, cy - r*0.1, r*0.2, 0, Math.PI*2); ctx.fill();
-                            // Shadow Terminator
-                            const shadow = ctx.createLinearGradient(cx-r, cy-r, cx+r, cy+r);
-                            shadow.addColorStop(0, 'rgba(0,0,0,0)');
-                            shadow.addColorStop(0.5, 'rgba(0,0,0,0.4)');
-                            shadow.addColorStop(1, 'rgba(0,0,0,0.95)');
-                            ctx.fillStyle = shadow;
-                            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
-                            ctx.restore();
-                        }
-
-                        function drawMoon(ctx, cx, cy, r) {
-                            ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.clip();
-                            ctx.fillStyle = '#cccccc'; ctx.fill();
-                            ctx.fillStyle = '#999999'; // Craters
-                            ctx.beginPath(); ctx.arc(cx - r*0.3, cy - r*0.2, r*0.25, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.arc(cx + r*0.4, cy + r*0.3, r*0.35, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.arc(cx - r*0.1, cy + r*0.4, r*0.15, 0, Math.PI*2); ctx.fill();
-                            ctx.restore();
-                            ctx.shadowBlur = 15; ctx.shadowColor = '#ffffff';
-                            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
-                            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
-                            ctx.shadowBlur = 0;
-                        }
-
-                        function drawMissile(ctx, x, y, tx, ty) {
-                            const angle = Math.atan2(ty - y, tx - x);
-                            ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
-                            ctx.fillStyle = Math.random() > 0.5 ? '#ffcc00' : '#ff3300';
-                            ctx.beginPath(); ctx.moveTo(-15, -6); ctx.lineTo(-50, 0); ctx.lineTo(-15, 6); ctx.fill();
-                            ctx.fillStyle = '#eeeeee'; ctx.fillRect(-15, -4, 30, 8);
-                            ctx.fillStyle = '#ff0000'; ctx.beginPath(); ctx.moveTo(15, -4); ctx.lineTo(25, 0); ctx.lineTo(15, 4); ctx.fill();
-                            ctx.restore();
-                        }
-
-                        function drawNews(ctx, w, h, t) {
-                            ctx.save();
-                            // Handheld Camera Shake Effect
-                            const camX = Math.sin(t/150)*10 + Math.cos(t/100)*5;
-                            const camY = Math.cos(t/120)*8 + Math.sin(t/80)*4;
-                            ctx.translate(w/2, h/2); ctx.scale(1.05, 1.05); ctx.translate(-w/2 + camX, -h/2 + camY);
-                            
-                            // Flashing red emergency sky
-                            if (Math.floor(t / 400) % 2 === 0) { ctx.fillStyle = '#440000'; } else { ctx.fillStyle = '#220000'; }
-                            ctx.fillRect(0,0,w,h);
-                            
-                            // Dark stormy clouds in background
-                            ctx.fillStyle = 'rgba(10, 0, 0, 0.6)';
-                            ctx.beginPath(); ctx.ellipse(w*0.3 - (t*0.02)%w, h*0.2, 400, 100, 0, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.ellipse(w*0.8 - (t*0.03)%w, h*0.3, 500, 150, 0, 0, Math.PI*2); ctx.fill();
-
-                            // Public City Buildings (Silhouettes)
-                            ctx.fillStyle = '#0a0a0a';
-                            for(let i=-100; i<w+100; i+=140) {
-                                ctx.fillRect(i, h*0.4 + Math.sin(i)*100, 120, h);
-                                // Lit windows
-                                ctx.fillStyle = 'rgba(255, 200, 0, 0.3)';
-                                if(Math.random()>0.4) ctx.fillRect(i+20, h*0.5 + Math.sin(i)*100, 20, 30);
-                                if(Math.random()>0.4) ctx.fillRect(i+70, h*0.6 + Math.sin(i)*100, 20, 30);
-                                ctx.fillStyle = '#0a0a0a';
-                            }
-                            
-                            // Ground Street
-                            ctx.fillStyle = '#111'; ctx.fillRect(-100, h-180, w+200, 180);
-
-                            // Panicking Crowd Background Layer
-                            panicPeople.forEach(p => {
-                                p.x += p.speed;
-                                if (p.x > w + 100) p.x = -100;
-                                if (p.x < -100) p.x = w + 100;
-                                ctx.fillStyle = p.color;
-                                let px = p.x, py = h - p.y;
-                                ctx.beginPath(); ctx.arc(px, py-40*p.size, 10*p.size, 0, Math.PI*2); ctx.fill();
-                                ctx.fillRect(px-5*p.size, py-30*p.size, 10*p.size, 30*p.size);
-                                let legOffset = Math.sin(t*0.03 * p.speed)*15*p.size;
-                                ctx.strokeStyle = p.color; ctx.lineWidth = 4*p.size;
-                                ctx.beginPath(); ctx.moveTo(px, py-5*p.size); ctx.lineTo(px + legOffset, py + 20*p.size); ctx.stroke();
-                                ctx.beginPath(); ctx.moveTo(px, py-5*p.size); ctx.lineTo(px - legOffset, py + 20*p.size); ctx.stroke();
-                            });
-                            
-                            // Anchor Person - Standing in public holding mic
-                            const ax = w*0.75, ay = h-50;
-                            ctx.fillStyle = '#1a1a1a'; ctx.fillRect(ax - 55, ay - 200, 110, 200); // Suit body
-                            ctx.fillStyle = '#ffccaa'; ctx.beginPath(); ctx.arc(ax, ay - 230, 35, 0, Math.PI*2); ctx.fill(); // Head
-                            ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(ax, ay - 235, 36, Math.PI, 0); ctx.fill(); // Hair
-                            
-                            // Scary Red Eyes
-                            ctx.fillStyle = '#ff0000'; ctx.shadowBlur = 10; ctx.shadowColor = 'red';
-                            ctx.fillRect(ax - 15, ay - 238, 8, 4); ctx.fillRect(ax + 7, ay - 238, 8, 4);
-                            ctx.shadowBlur = 0;
-
-                            // Hand and Mic shaking in panic
-                            const micShake = Math.sin(t/50)*4;
-                            ctx.fillStyle = '#ffccaa'; ctx.beginPath(); ctx.arc(ax-35, ay-140+micShake, 15, 0, Math.PI*2); ctx.fill(); // Hand
-                            ctx.fillStyle = '#333'; ctx.fillRect(ax-45, ay-180+micShake, 10, 50); // Mic handle
-                            ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(ax-40, ay-185+micShake, 18, 0, Math.PI*2); ctx.fill(); // Mic top
-                            
-                            ctx.restore(); // Restore camera shake so UI overlays stay static
-
-                            // --- STATIC UI OVERLAYS ---
-
-                            // Huge PiP Screen (Missile taking off)
-                            const sw = 380, sh = 280, sx = 40, sy = 60;
-                            
-                            // Apply clip so PiP contents don't leak out of the bounds
-                            ctx.save();
-                            ctx.beginPath();
-                            ctx.rect(sx, sy, sw, sh);
-                            ctx.clip();
-
-                            ctx.fillStyle = '#4aa3df'; ctx.fillRect(sx, sy, sw, sh);
-                            
-                            // Clouds in PiP
-                            ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                            ctx.beginPath(); ctx.arc(sx+100, sy+150, 40, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.arc(sx+180, sy+120, 70, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.arc(sx+260, sy+160, 50, 0, Math.PI*2); ctx.fill();
-
-                            // Launchpad & Rocket
-                            ctx.fillStyle = '#555'; ctx.fillRect(sx + sw/2 - 40, sy + sh - 40, 80, 40);
-                            let rY = sy + sh - (t/10000)*sh*2.0; // Slow launch over 10 seconds
-                            ctx.fillStyle = '#ddd'; ctx.fillRect(sx + sw/2 - 16, rY - 100, 32, 100);
-                            ctx.fillStyle = '#ff0000'; ctx.beginPath(); ctx.moveTo(sx+sw/2-16, rY-100); ctx.lineTo(sx+sw/2+16, rY-100); ctx.lineTo(sx+sw/2, rY-150); ctx.fill();
-                            
-                            // Massive Engine Flame
-                            const fSize = 30 + Math.random()*20;
-                            ctx.fillStyle = '#f90'; ctx.beginPath(); ctx.arc(sx + sw/2, rY + 10, fSize, 0, Math.PI*2); ctx.fill();
-                            ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.arc(sx + sw/2, rY + 5, fSize*0.6, 0, Math.PI*2); ctx.fill();
-                            
-                            // Smoke Plumes
-                            ctx.fillStyle = 'rgba(200,200,200,0.6)';
-                            for(let i=0; i<15; i++) {
-                                ctx.beginPath(); ctx.arc(sx+sw/2 + (Math.random()-0.5)*180, rY + 40 + Math.random()*180, 30+Math.random()*60, 0, Math.PI*2); ctx.fill();
-                            }
-
-                            ctx.restore(); // Stop clipping
-                            
-                            ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.strokeRect(sx, sy, sw, sh);
-                            
-                            // News Ticker (Detailed and Slower)
-                            ctx.fillStyle = 'rgba(0,0,0,0.9)'; ctx.fillRect(0, h-70, w, 70);
-                            ctx.fillStyle = '#fff'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'left';
-                            
-                            const msg = "BREAKING NEWS: UNAUTHORIZED NUCLEAR LAUNCH DETECTED FROM UNKNOWN ORIGIN... GLOBAL DEFENSE SYSTEMS REPORT CRITICAL FAILURE... TARGET ACQUIRED: THE LUNAR SURFACE... MILITARY ADVISES ALL CITIZENS TO SEEK SHELTER IMMEDIATELY... THIS IS NOT A DRILL... REPEAT, THIS IS NOT A DRILL... MAY GOD HELP US ALL...";
-                            const textWidth = ctx.measureText(msg).width;
-                            // Scroll text slowly over 16 seconds
-                            const scrollX = w - ((t % 16000) / 16000) * (w + textWidth);
-                            ctx.fillText(msg, scrollX, h-25);
-                            
-                            // Top LIVE borders
-                            ctx.fillStyle = '#ff3300'; ctx.fillRect(0, h-75, w, 5); 
-                            
-                            // LIVE Indicator
-                            if (Math.floor(t / 500) % 2 === 0) {
-                                ctx.fillStyle = 'red'; ctx.fillRect(40, 10, 100, 35);
-                                ctx.fillStyle = 'white'; ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center';
-                                ctx.fillText("LIVE", 90, 35);
-                            }
-                        }
-
-                        function drawLoop() {
-                            if (!document.getElementById(`${id}-nuke-canvas`)) return;
-                            cvs.width = cvs.clientWidth; cvs.height = cvs.clientHeight;
-                            const w = cvs.width, h = cvs.height;
-                            const t = Date.now() - startTime;
-
-                            // Phase 1: Extended News Broadcast (10 seconds)
-                            if (t < 10000) {
-                                drawNews(ctx, w, h, t);
-                            } 
-                            // Phase 2 & 3: Space Flight and Impact (17 seconds total space scene)
-                            else if (t < 27000) {
-                                const st = t - 10000; // space time mapping
+                            setTimeout(() => {
+                                cursor.style.transform = 'scale(0.8)'; setTimeout(() => cursor.style.transform = 'scale(1)', 100);
                                 
-                                if (!spaceAudioPlayed) {
-                                    spaceAudioPlayed = true;
-                                    try {
-                                        const actx = new (window.AudioContext || window.webkitAudioContext)();
-                                        const osc = actx.createOscillator(); const gain = actx.createGain();
-                                        osc.type = 'sine'; osc.frequency.setValueAtTime(800, actx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, actx.currentTime + 8.0);
-                                        gain.gain.setValueAtTime(0.2, actx.currentTime); gain.gain.linearRampToValueAtTime(0.6, actx.currentTime + 8.0);
-                                        osc.connect(gain); gain.connect(actx.destination); osc.start(); osc.stop(actx.currentTime + 8.0);
-                                    } catch(e){}
-                                }
+                                let text = "DoorTube Emergency Broadcast";
+                                let i = 0;
+                                let typeInt = setInterval(() => {
+                                    inputEl.value += text.charAt(i);
+                                    i++;
+                                    if(i >= text.length) {
+                                        clearInterval(typeInt);
+                                        
+                                        const btnEl = document.getElementById(`${id}-ds-btn-nuke`);
+                                        const bRect = btnEl.getBoundingClientRect();
+                                        cursor.style.left = (bRect.left + 20) + 'px';
+                                        cursor.style.top = (bRect.top + 15) + 'px';
+                                        
+                                        setTimeout(() => {
+                                            // Click Search
+                                            cursor.style.transform = 'scale(0.8)'; setTimeout(() => cursor.style.transform = 'scale(1)', 100);
+                                            
+                                            // 3. Show Fake Search Results
+                                            urlInput.value = "DoorTube Emergency Broadcast";
+                                            showCustom(`
+                                                <div style="max-width:800px; margin:40px auto; color:#333; font-family:'Segoe UI', sans-serif;">
+                                                    <h2 style="border-bottom:1px solid #ccc; padding-bottom:10px;">Search Results</h2>
+                                                    <div id="${id}-fake-thumb" style="display:flex; gap:20px; cursor:pointer; margin-top:20px; padding:15px; border-radius:10px; background:#f9f9f9; border:1px solid #eee; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+                                                        <div style="width:240px; height:135px; background:#000; border-radius:8px; position:relative; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                                            <div style="color:red; font-size:50px; text-shadow:0 0 20px red;">⚠️</div>
+                                                            <div style="position:absolute; bottom:8px; right:8px; background:red; color:white; font-size:12px; padding:4px 6px; border-radius:4px; font-weight:bold; letter-spacing:1px;">LIVE</div>
+                                                        </div>
+                                                        <div>
+                                                            <h3 style="margin:0 0 8px 0; color:#1a0dab; font-size:22px;">🔴 LIVE: EMERGENCY BROADCAST - GLOBAL NEWS NETWORK</h3>
+                                                            <p style="color:#006621; margin:0 0 10px 0; font-size:14px;">www.doortube.com › live › gnn-emergency</p>
+                                                            <p style="color:#545454; font-size:14px; line-height:1.5;">UNAUTHORIZED LAUNCH DETECTED. ALL CITIZENS SEEK SHELTER IMMEDIATELY. MULTIPLE TARGETS ACQUIRED. GLOBAL DEFENSE SYSTEMS OFFLINE.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `);
+                                            
+                                            setTimeout(() => {
+                                                const thumb = document.getElementById(`${id}-fake-thumb`);
+                                                const tRect = thumb.getBoundingClientRect();
+                                                cursor.style.left = (tRect.left + 120) + 'px';
+                                                cursor.style.top = (tRect.top + 60) + 'px';
+                                                
+                                                setTimeout(() => {
+                                                    // Click Thumbnail
+                                                    cursor.style.transform = 'scale(0.8)'; setTimeout(() => cursor.style.transform = 'scale(1)', 100);
+                                                    
+                                                    setTimeout(() => {
+                                                        cursor.style.display = 'none'; // Sequence over, hide cursor
+                                                        
+                                                        // 4. LAUNCH DOORTUBE UI & CANVAS
+                                                        urlInput.value = "https://www.doortube.com/live/gnn-emergency";
+                                                        showCustom(`
+                                                            <div style="width: 100%; height: 100%; background: #0f0f0f; color: #f1f1f1; font-family: 'Roboto', 'Segoe UI', Arial, sans-serif; overflow-y: auto; text-align: left;">
+                                                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: #0f0f0f; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #222;">
+                                                                    <div style="font-size: 20px; font-weight: bold; letter-spacing: -1px; display: flex; align-items: center; gap: 5px;">
+                                                                        <span style="color: red; font-size: 24px;">▶</span> DoorTube <span style="background:red; color:white; font-size:10px; padding:2px 4px; border-radius:2px; margin-left:5px;">LIVE</span>
+                                                                    </div>
+                                                                    <div style="display: flex; gap: 0; flex: 1; max-width: 500px; margin: 0 20px;">
+                                                                        <input type="text" placeholder="Search" disabled style="flex: 1; background: #121212; border: 1px solid #303030; color: white; padding: 8px 16px; border-radius: 20px 0 0 20px; outline: none; font-size: 16px;">
+                                                                        <button disabled style="background: #222; border: 1px solid #303030; border-left: none; padding: 8px 20px; border-radius: 0 20px 20px 0; color: white; font-size: 16px;">🔍</button>
+                                                                    </div>
+                                                                    <div style="display: flex; gap: 15px; font-size: 18px; align-items: center;">
+                                                                        <span style="cursor: pointer;">📹</span>
+                                                                        <span style="cursor: pointer;">🔔</span>
+                                                                        <div style="width:30px; height:30px; background:#0067c0; border-radius:50%; text-align:center; line-height:30px; font-size: 14px; font-weight: bold; cursor: pointer;">G</div>
+                                                                    </div>
+                                                                </div>
 
-                                // Draw Starfield
-                                ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
-                                ctx.fillStyle = '#fff';
-                                stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x*w, s.y*h, s.s, 0, Math.PI*2); ctx.fill(); });
-                                
-                                const ex = w*0.15, ey = h*0.85, er = Math.min(w,h)*0.25;
-                                drawEarth(ctx, ex, ey, er, st);
-                                
-                                const mx = w*0.85, my = h*0.15, mr = Math.min(w,h)*0.1;
-                                
-                                // Phase 2: Missile Transit (8 seconds)
-                                if (st < 8000) {
-                                    drawMoon(ctx, mx, my, mr);
-                                    const pr = st / 8000; // progress from 0 to 1
-                                    const exEased = ex + (mx-ex)*pr;
-                                    const eyEased = ey + (my-ey)*pr;
-                                    drawMissile(ctx, exEased, eyEased, mx, my);
-                                } 
-                                // Phase 3: Shatter and Fall (9 seconds)
-                                else {
-                                    if (!impacted) { impacted = true; initDebris(mx, my); flashAlpha = 1; }
-                                    
-                                    // Render flaming shattering debris
-                                    debris.forEach(d => {
-                                        d.x += d.vx; d.y += d.vy; d.scale += d.scaleSpeed; d.rot += d.rotV;
-                                        ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(d.rot); ctx.scale(d.scale, d.scale);
-                                        ctx.fillStyle = '#888'; ctx.fillRect(-d.size/2, -d.size/2, d.size, d.size);
-                                        ctx.fillStyle = 'rgba(255, 100, 0, 0.6)'; ctx.fillRect(-d.size/2-3, -d.size/2-3, d.size+6, d.size+6);
-                                        ctx.restore();
-                                    });
-                                    
-                                    if (flashAlpha > 0) {
-                                        ctx.fillStyle = `rgba(255, 200, 0, ${flashAlpha})`; ctx.fillRect(0,0,w,h);
-                                        flashAlpha -= 0.03;
+                                                                <div style="display: flex; padding: 24px; gap: 24px; max-width: 1400px; margin: 0 auto; flex-wrap: wrap;">
+                                                                    <div style="flex: 3; min-width: 60%; display: flex; flex-direction: column;">
+                                                                        <div style="width: 100%; aspect-ratio: 16/9; background: black; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.5); position: relative;">
+                                                                            <canvas id="${id}-nuke-canvas" style="width:100%; height:100%; display:block;"></canvas>
+                                                                        </div>
+                                                                        
+                                                                        <h1 style="font-size: 22px; font-weight: 600; margin: 15px 0 10px 0;">🔴 LIVE: EMERGENCY BROADCAST - UNAUTHORIZED LAUNCH DETECTED</h1>
+                                                                        
+                                                                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #303030; padding-bottom: 15px; flex-wrap: wrap; gap: 15px;">
+                                                                            <div style="display: flex; align-items: center; gap: 12px;">
+                                                                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #900; display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 14px; font-weight:bold;">
+                                                                                    GNN
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div style="font-weight: bold; font-size: 16px;">Global News Network <span style="color:#aaa; font-size:12px;">✓</span></div>
+                                                                                    <div style="font-size: 12px; color: #aaa;">24.1M subscribers</div>
+                                                                                </div>
+                                                                                <button style="background: #272727; color: white; border: none; padding: 10px 16px; border-radius: 20px; font-weight: bold; margin-left: 15px;">Subscribed</button>
+                                                                            </div>
+                                                                            <div style="display: flex; gap: 10px;">
+                                                                                <button style="background: #272727; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor:pointer; display: flex; align-items: center; gap: 8px;">👍 890K | 👎</button>
+                                                                                <button style="background: #272727; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor:pointer; display: flex; align-items: center; gap: 8px;">↪ Share</button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div style="background: #272727; padding: 15px; border-radius: 12px; margin-top: 15px; font-size: 14px; line-height: 1.5;">
+                                                                            <b style="color:red;">8,452,192 watching now • Started streaming 2 minutes ago</b><br><br>
+                                                                            EMERGENCY BROADCAST. ALL CITIZENS ARE ADVISED TO SEEK SHELTER IMMEDIATELY.
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Chaotic Live Chat -->
+                                                                    <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; background: #181818; border: 1px solid #303030; border-radius: 12px; overflow: hidden; height: 600px;">
+                                                                        <div style="padding: 15px; border-bottom: 1px solid #303030; font-weight: bold;">Top Chat</div>
+                                                                        <div id="${id}-live-chat" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                                                                            <!-- Chat messages appended here -->
+                                                                        </div>
+                                                                        <div style="padding: 15px; border-top: 1px solid #303030;">
+                                                                            <input type="text" placeholder="Chat is moving too fast..." disabled style="width: 100%; background: #222; border: 1px solid #444; color: #888; padding: 10px; border-radius: 20px;">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        `);
+
+                                                        // Logic for generating fake live chat spam
+                                                        const chatNames = ['GamerPro99', 'xX_Shadow_Xx', 'Anonymous', 'User1234', 'DeepmalyaFan', 'DoomBringer', 'RickAstley', 'NoobMaster69', 'JohnDoe', 'KittenLover', 'AstroBoy', 'HackerMan', 'TechBro', 'SystemAdmin', 'Bob'];
+                                                        const chatMsgs = ['WHAT IS HAPPENING', 'IS THIS REAL?', 'gg guys', 'mom come pick me up i\'m scared', 'FAKE', 'RIP EARTH', 'F', 'F', 'F', 'F', 'WE ARE DOOMED', 'I forgot to clear my history', 'Can I have your PC if u die?', 'Bro no way', 'Is this a drill??', 'L', 'W', 'W chat', 'First', 'I was here', 'bye everyone', 'o7', 'o7', 'o7'];
+                                                        let chatInterval = setInterval(() => {
+                                                            const chatEl = document.getElementById(`${id}-live-chat`);
+                                                            if(!chatEl) { clearInterval(chatInterval); return; }
+                                                            
+                                                            for(let i=0; i<Math.floor(Math.random()*4)+2; i++) {
+                                                                const name = chatNames[Math.floor(Math.random()*chatNames.length)];
+                                                                const msg = chatMsgs[Math.floor(Math.random()*chatMsgs.length)];
+                                                                const color = `hsl(${Math.random() * 360}, 100%, 70%)`; 
+                                                                const div = document.createElement('div');
+                                                                div.innerHTML = `<span style="color:${color}; font-weight:bold; margin-right:5px;">${name}</span><span style="color:#ddd;">${msg}</span>`;
+                                                                chatEl.appendChild(div);
+                                                            }
+                                                            if(chatEl.children.length > 50) {
+                                                                for(let i=0; i<10; i++) chatEl.removeChild(chatEl.firstChild);
+                                                            }
+                                                            chatEl.scrollTop = chatEl.scrollHeight;
+                                                        }, 150);
+                                                        
+                                                        const cvs = document.getElementById(`${id}-nuke-canvas`);
+                                                        const ctx = cvs.getContext('2d');
+                                                        
+                                                        // Setup Space Assets
+                                                        const stars = [];
+                                                        for(let i=0; i<300; i++) stars.push({x: Math.random(), y: Math.random(), s: Math.random()*2.0});
+                                                        
+                                                        // Setup Panic People
+                                                        const panicPeople = [];
+                                                        for(let i=0; i<40; i++) {
+                                                            panicPeople.push({
+                                                                x: Math.random() * 2000,
+                                                                y: 80 + Math.random() * 60,
+                                                                speed: (Math.random() * 4 + 4) * (Math.random() > 0.5 ? 1 : -1),
+                                                                color: `hsl(${Math.random()*360}, 40%, 15%)`,
+                                                                size: Math.random() * 0.4 + 0.6
+                                                            });
+                                                        }
+
+                                                        let debris = [];
+                                                        function initDebris(cx, cy) {
+                                                            for(let i=0; i<90; i++) {
+                                                                debris.push({
+                                                                    x: cx, y: cy, 
+                                                                    vx: (Math.random()-0.5)*25, 
+                                                                    vy: (Math.random()-0.5)*25,
+                                                                    size: Math.random()*20 + 5, 
+                                                                    scale: 1, 
+                                                                    scaleSpeed: Math.random()*0.12 + 0.02,
+                                                                    rot: Math.random()*Math.PI*2, 
+                                                                    rotV: (Math.random()-0.5)*0.3
+                                                                });
+                                                            }
+                                                            // Massive Explosion Audio
+                                                            try {
+                                                                const actx = new (window.AudioContext || window.webkitAudioContext)();
+                                                                const osc = actx.createOscillator(); 
+                                                                const gain = actx.createGain();
+                                                                osc.type = 'sawtooth'; 
+                                                                osc.frequency.setValueAtTime(80, actx.currentTime);
+                                                                osc.frequency.exponentialRampToValueAtTime(1, actx.currentTime + 6.0);
+                                                                gain.gain.setValueAtTime(4, actx.currentTime); 
+                                                                gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 6.0);
+                                                                osc.connect(gain); gain.connect(actx.destination);
+                                                                osc.start(); osc.stop(actx.currentTime + 6.0);
+
+                                                                // High pitch shatter
+                                                                const bufferSize = actx.sampleRate * 2;
+                                                                const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
+                                                                const data = buffer.getChannelData(0);
+                                                                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                                                                const noise = actx.createBufferSource(); noise.buffer = buffer;
+                                                                const nFilter = actx.createBiquadFilter(); nFilter.type = 'highpass'; nFilter.frequency.value = 1000;
+                                                                const nGain = actx.createGain(); nGain.gain.setValueAtTime(2, actx.currentTime); nGain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 2.0);
+                                                                noise.connect(nFilter); nFilter.connect(nGain); nGain.connect(actx.destination);
+                                                                noise.start();
+                                                            } catch(e){}
+                                                        }
+
+                                                        let startTime = Date.now();
+                                                        let impacted = false;
+                                                        let flashAlpha = 0;
+                                                        let spaceAudioPlayed = false;
+                                                        window.bsodTriggered = false;
+
+                                                        // Start Intro Audio
+                                                        try {
+                                                            const actx = new (window.AudioContext || window.webkitAudioContext)();
+                                                            // Crowd Noise
+                                                            const bufferSize = actx.sampleRate * 2;
+                                                            const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
+                                                            const data = buffer.getChannelData(0);
+                                                            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                                                            const noise = actx.createBufferSource(); noise.buffer = buffer; noise.loop = true;
+                                                            const filter = actx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 400;
+                                                            const gain = actx.createGain(); gain.gain.setValueAtTime(0.6, actx.currentTime); gain.gain.linearRampToValueAtTime(0, actx.currentTime + 10.0);
+                                                            noise.connect(filter); filter.connect(gain); gain.connect(actx.destination);
+                                                            noise.start(); noise.stop(actx.currentTime + 10.0);
+                                                            
+                                                            // Rocket Rumble
+                                                            const osc = actx.createOscillator(); const rGain = actx.createGain();
+                                                            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(80, actx.currentTime); osc.frequency.linearRampToValueAtTime(30, actx.currentTime + 10.0);
+                                                            rGain.gain.setValueAtTime(0.8, actx.currentTime); rGain.gain.linearRampToValueAtTime(0, actx.currentTime + 10.0);
+                                                            osc.connect(rGain); rGain.connect(actx.destination);
+                                                            osc.start(); osc.stop(actx.currentTime + 10.0);
+                                                        } catch(e){}
+
+                                                        // Drawing Helpers
+                                                        function drawEarth(ctx, cx, cy, r, t) {
+                                                            ctx.save(); 
+                                                            // Atmosphere glow
+                                                            const atmo = ctx.createRadialGradient(cx, cy, r*0.8, cx, cy, r*1.3);
+                                                            atmo.addColorStop(0, 'rgba(74, 163, 223, 0.8)');
+                                                            atmo.addColorStop(1, 'rgba(74, 163, 223, 0)');
+                                                            ctx.fillStyle = atmo;
+                                                            ctx.beginPath(); ctx.arc(cx, cy, r*1.3, 0, Math.PI*2); ctx.fill();
+
+                                                            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.clip();
+                                                            // Ocean 3D
+                                                            const ocean = ctx.createRadialGradient(cx-r*0.3, cy-r*0.3, r*0.1, cx, cy, r);
+                                                            ocean.addColorStop(0, '#4aa3df'); ocean.addColorStop(1, '#001a4d');
+                                                            ctx.fillStyle = ocean; ctx.fill();
+                                                            // Continents
+                                                            ctx.fillStyle = '#1e824c';
+                                                            ctx.beginPath(); ctx.arc(cx - r*0.2, cy - r*0.2, r*0.6, 0, Math.PI*2); ctx.fill();
+                                                            ctx.beginPath(); ctx.arc(cx + r*0.4, cy + r*0.3, r*0.5, 0, Math.PI*2); ctx.fill();
+                                                            ctx.beginPath(); ctx.ellipse(cx - r*0.5, cy + r*0.5, r*0.6, r*0.2, -Math.PI/4, 0, Math.PI*2); ctx.fill();
+                                                            // Earth Clouds
+                                                            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                                                            let cloudOffset = (t * 0.005) % (r*2);
+                                                            ctx.beginPath(); ctx.arc(cx - r + cloudOffset, cy + r*0.1, r*0.3, 0, Math.PI*2); ctx.fill();
+                                                            ctx.beginPath(); ctx.arc(cx + r*0.3 - cloudOffset*0.5, cy - r*0.4, r*0.4, 0, Math.PI*2); ctx.fill();
+                                                            ctx.beginPath(); ctx.arc(cx - r*0.6 + cloudOffset, cy - r*0.1, r*0.2, 0, Math.PI*2); ctx.fill();
+                                                            // Shadow Terminator
+                                                            const shadow = ctx.createLinearGradient(cx-r, cy-r, cx+r, cy+r);
+                                                            shadow.addColorStop(0, 'rgba(0,0,0,0)');
+                                                            shadow.addColorStop(0.5, 'rgba(0,0,0,0.4)');
+                                                            shadow.addColorStop(1, 'rgba(0,0,0,0.95)');
+                                                            ctx.fillStyle = shadow;
+                                                            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+                                                            ctx.restore();
+                                                        }
+
+                                                        function drawMoon(ctx, cx, cy, r) {
+                                                            ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.clip();
+                                                            ctx.fillStyle = '#cccccc'; ctx.fill();
+                                                            ctx.fillStyle = '#999999'; // Craters
+                                                            ctx.beginPath(); ctx.arc(cx - r*0.3, cy - r*0.2, r*0.25, 0, Math.PI*2); ctx.fill();
+                                                            ctx.beginPath(); ctx.arc(cx + r*0.4, cy + r*0.3, r*0.35, 0, Math.PI*2); ctx.fill();
+                                                            ctx.beginPath(); ctx.arc(cx - r*0.1, cy + r*0.4, r*0.15, 0, Math.PI*2); ctx.fill();
+                                                            ctx.restore();
+                                                            ctx.shadowBlur = 15; ctx.shadowColor = '#ffffff';
+                                                            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
+                                                            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
+                                                            ctx.shadowBlur = 0;
+                                                        }
+
+                                                        // --- ANIME CINEMATIC EFFECTS ---
+                                                        function drawSpeedLines(ctx, w, h, t) {
+                                                            ctx.save();
+                                                            ctx.translate(w/2, h/2);
+                                                            for(let i=0; i<80; i++) {
+                                                                ctx.rotate((Math.PI*2) / 80);
+                                                                const speed = 15;
+                                                                const offset = (t * speed + i * 100) % Math.max(w, h);
+                                                                if(offset < w*0.15) continue; // Keep center clear
+                                                                ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.6})`;
+                                                                ctx.fillRect(offset, -1, 150 + Math.random()*300, 1 + Math.random()*3);
+                                                            }
+                                                            ctx.restore();
+                                                        }
+
+                                                        function drawAnimeBeam(ctx, x, y, tx, ty, t) {
+                                                            const angle = Math.atan2(ty - y, tx - x);
+                                                            ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
+                                                            
+                                                            // Pulsing aura
+                                                            const pulse = Math.sin(t/50) * 10;
+                                                            
+                                                            // Outer Glow
+                                                            ctx.shadowBlur = 40 + pulse; ctx.shadowColor = '#ff0033';
+                                                            ctx.fillStyle = 'rgba(255, 0, 50, 0.4)';
+                                                            ctx.beginPath(); ctx.ellipse(-40, 0, 180 + pulse*2, 25 + pulse, 0, 0, Math.PI*2); ctx.fill();
+                                                            
+                                                            // Inner Beam
+                                                            ctx.fillStyle = '#ffffff';
+                                                            ctx.shadowBlur = 20; ctx.shadowColor = '#ffffff';
+                                                            ctx.beginPath(); ctx.ellipse(-20, 0, 120, 10, 0, 0, Math.PI*2); ctx.fill();
+                                                            
+                                                            // Core Spearhead
+                                                            ctx.fillStyle = '#aaddff';
+                                                            ctx.beginPath(); ctx.moveTo(60, 0); ctx.lineTo(-30, 12); ctx.lineTo(-30, -12); ctx.fill();
+                                                            
+                                                            // High-speed trailing energy particles
+                                                            ctx.shadowBlur = 0;
+                                                            for(let i=0; i<20; i++) {
+                                                                ctx.fillStyle = Math.random()>0.5 ? '#ffcc00' : '#ff0033';
+                                                                const pLength = Math.random()*100 + 30;
+                                                                const pX = -60 - Math.random()*250 - (t*2)%150;
+                                                                const pY = (Math.random()-0.5) * 40;
+                                                                ctx.fillRect(pX, pY, pLength, 2 + Math.random()*2);
+                                                            }
+                                                            
+                                                            // Energy Rings (Anime style beam rings)
+                                                            if (Math.floor(t/40) % 3 === 0) {
+                                                                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                                                                ctx.lineWidth = 5;
+                                                                ctx.beginPath(); ctx.ellipse(-20, 0, 15, 40 + pulse, 0, 0, Math.PI*2); ctx.stroke();
+                                                            }
+                                                            
+                                                            ctx.restore();
+                                                        }
+
+                                                        function drawNews(ctx, w, h, t) {
+                                                            ctx.save();
+                                                            // Handheld Camera Shake Effect
+                                                            const camX = Math.sin(t/150)*10 + Math.cos(t/100)*5;
+                                                            const camY = Math.cos(t/120)*8 + Math.sin(t/80)*4;
+                                                            ctx.translate(w/2, h/2); ctx.scale(1.05, 1.05); ctx.translate(-w/2 + camX, -h/2 + camY);
+                                                            
+                                                            // Flashing red emergency sky
+                                                            if (Math.floor(t / 400) % 2 === 0) { ctx.fillStyle = '#440000'; } else { ctx.fillStyle = '#220000'; }
+                                                            ctx.fillRect(0,0,w,h);
+                                                            
+                                                            // Dark stormy clouds in background
+                                                            ctx.fillStyle = 'rgba(10, 0, 0, 0.6)';
+                                                            ctx.beginPath(); ctx.ellipse(w*0.3 - (t*0.02)%w, h*0.2, 400, 100, 0, 0, Math.PI*2); ctx.fill();
+                                                            ctx.beginPath(); ctx.ellipse(w*0.8 - (t*0.03)%w, h*0.3, 500, 150, 0, 0, Math.PI*2); ctx.fill();
+
+                                                            // Public City Buildings (Silhouettes)
+                                                            ctx.fillStyle = '#0a0a0a';
+                                                            for(let i=-100; i<w+100; i+=140) {
+                                                                ctx.fillRect(i, h*0.4 + Math.sin(i)*100, 120, h);
+                                                                // Lit windows
+                                                                ctx.fillStyle = 'rgba(255, 200, 0, 0.3)';
+                                                                if(Math.random()>0.4) ctx.fillRect(i+20, h*0.5 + Math.sin(i)*100, 20, 30);
+                                                                if(Math.random()>0.4) ctx.fillRect(i+70, h*0.6 + Math.sin(i)*100, 20, 30);
+                                                                ctx.fillStyle = '#0a0a0a';
+                                                            }
+                                                            
+                                                            // Ground Street
+                                                            ctx.fillStyle = '#111'; ctx.fillRect(-100, h-180, w+200, 180);
+
+                                                            // Panicking Crowd Background Layer
+                                                            panicPeople.forEach(p => {
+                                                                p.x += p.speed;
+                                                                if (p.x > w + 100) p.x = -100;
+                                                                if (p.x < -100) p.x = w + 100;
+                                                                ctx.fillStyle = p.color;
+                                                                let px = p.x, py = h - p.y;
+                                                                ctx.beginPath(); ctx.arc(px, py-40*p.size, 10*p.size, 0, Math.PI*2); ctx.fill();
+                                                                ctx.fillRect(px-5*p.size, py-30*p.size, 10*p.size, 30*p.size);
+                                                                let legOffset = Math.sin(t*0.03 * p.speed)*15*p.size;
+                                                                ctx.strokeStyle = p.color; ctx.lineWidth = 4*p.size;
+                                                                ctx.beginPath(); ctx.moveTo(px, py-5*p.size); ctx.lineTo(px + legOffset, py + 20*p.size); ctx.stroke();
+                                                                ctx.beginPath(); ctx.moveTo(px, py-5*p.size); ctx.lineTo(px - legOffset, py + 20*p.size); ctx.stroke();
+                                                            });
+                                                            
+                                                            // Anchor Person - Standing in public holding mic
+                                                            const ax = w*0.75, ay = h-50;
+                                                            ctx.fillStyle = '#1a1a1a'; ctx.fillRect(ax - 55, ay - 200, 110, 200); // Suit body
+                                                            ctx.fillStyle = '#ffccaa'; ctx.beginPath(); ctx.arc(ax, ay - 230, 35, 0, Math.PI*2); ctx.fill(); // Head
+                                                            ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(ax, ay - 235, 36, Math.PI, 0); ctx.fill(); // Hair
+                                                            
+                                                            // Scary Red Eyes
+                                                            ctx.fillStyle = '#ff0000'; ctx.shadowBlur = 10; ctx.shadowColor = 'red';
+                                                            ctx.fillRect(ax - 15, ay - 238, 8, 4); ctx.fillRect(ax + 7, ay - 238, 8, 4);
+                                                            ctx.shadowBlur = 0;
+
+                                                            // Hand and Mic shaking in panic
+                                                            const micShake = Math.sin(t/50)*4;
+                                                            ctx.fillStyle = '#ffccaa'; ctx.beginPath(); ctx.arc(ax-35, ay-140+micShake, 15, 0, Math.PI*2); ctx.fill(); // Hand
+                                                            ctx.fillStyle = '#333'; ctx.fillRect(ax-45, ay-180+micShake, 10, 50); // Mic handle
+                                                            ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(ax-40, ay-185+micShake, 18, 0, Math.PI*2); ctx.fill(); // Mic top
+                                                            
+                                                            ctx.restore(); // Restore camera shake so UI overlays stay static
+
+                                                            // --- STATIC UI OVERLAYS ---
+
+                                                            // Huge PiP Screen (Missile taking off)
+                                                            const sw = 380, sh = 280, sx = 40, sy = 60;
+                                                            
+                                                            ctx.save();
+                                                            ctx.beginPath();
+                                                            ctx.rect(sx, sy, sw, sh);
+                                                            ctx.clip(); // Keep PiP contents inside bounds
+
+                                                            ctx.fillStyle = '#4aa3df'; ctx.fillRect(sx, sy, sw, sh);
+                                                            
+                                                            // Clouds in PiP
+                                                            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                                                            ctx.beginPath(); ctx.arc(sx+100, sy+150, 40, 0, Math.PI*2); ctx.fill();
+                                                            ctx.beginPath(); ctx.arc(sx+180, sy+120, 70, 0, Math.PI*2); ctx.fill();
+                                                            ctx.beginPath(); ctx.arc(sx+260, sy+160, 50, 0, Math.PI*2); ctx.fill();
+
+                                                            // Launchpad & Rocket
+                                                            ctx.fillStyle = '#555'; ctx.fillRect(sx + sw/2 - 40, sy + sh - 40, 80, 40);
+                                                            let rY = sy + sh - (t/10000)*sh*2.0; // Slow launch over 10 seconds
+                                                            ctx.fillStyle = '#ddd'; ctx.fillRect(sx + sw/2 - 16, rY - 100, 32, 100);
+                                                            ctx.fillStyle = '#ff0033'; ctx.beginPath(); ctx.moveTo(sx+sw/2-16, rY-100); ctx.lineTo(sx+sw/2+16, rY-100); ctx.lineTo(sx+sw/2, rY-150); ctx.fill();
+                                                            
+                                                            // Massive Engine Flame
+                                                            const fSize = 30 + Math.random()*20;
+                                                            ctx.fillStyle = '#f90'; ctx.beginPath(); ctx.arc(sx + sw/2, rY + 10, fSize, 0, Math.PI*2); ctx.fill();
+                                                            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(sx + sw/2, rY + 5, fSize*0.6, 0, Math.PI*2); ctx.fill();
+                                                            
+                                                            // Smoke Plumes
+                                                            ctx.fillStyle = 'rgba(200,200,200,0.6)';
+                                                            for(let i=0; i<15; i++) {
+                                                                ctx.beginPath(); ctx.arc(sx+sw/2 + (Math.random()-0.5)*180, rY + 40 + Math.random()*180, 30+Math.random()*60, 0, Math.PI*2); ctx.fill();
+                                                            }
+
+                                                            ctx.restore(); // Stop clipping
+                                                            
+                                                            ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.strokeRect(sx, sy, sw, sh);
+                                                            
+                                                            // News Ticker (Detailed and Slower)
+                                                            ctx.fillStyle = 'rgba(0,0,0,0.9)'; ctx.fillRect(0, h-70, w, 70);
+                                                            ctx.fillStyle = '#fff'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'left';
+                                                            
+                                                            const msg = "BREAKING NEWS: UNAUTHORIZED NUCLEAR LAUNCH DETECTED FROM UNKNOWN ORIGIN... GLOBAL DEFENSE SYSTEMS REPORT CRITICAL FAILURE... TARGET ACQUIRED: THE LUNAR SURFACE... MILITARY ADVISES ALL CITIZENS TO SEEK SHELTER IMMEDIATELY... THIS IS NOT A DRILL... REPEAT, THIS IS NOT A DRILL... MAY GOD HELP US ALL...";
+                                                            const textWidth = ctx.measureText(msg).width;
+                                                            // Scroll text slowly over 16 seconds
+                                                            const scrollX = w - ((t % 16000) / 16000) * (w + textWidth);
+                                                            ctx.fillText(msg, scrollX, h-25);
+                                                            
+                                                            // Top LIVE borders
+                                                            ctx.fillStyle = '#ff3300'; ctx.fillRect(0, h-75, w, 5); 
+                                                            
+                                                            // LIVE Indicator
+                                                            if (Math.floor(t / 500) % 2 === 0) {
+                                                                ctx.fillStyle = 'red'; ctx.fillRect(40, 10, 100, 35);
+                                                                ctx.fillStyle = 'white'; ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center';
+                                                                ctx.fillText("LIVE", 90, 35);
+                                                            }
+                                                        }
+
+                                                        function drawLoop() {
+                                                            if (!document.getElementById(`${id}-nuke-canvas`)) return;
+                                                            cvs.width = cvs.clientWidth; cvs.height = cvs.clientHeight;
+                                                            const w = cvs.width, h = cvs.height;
+                                                            const t = Date.now() - startTime;
+
+                                                            // Reset filters
+                                                            ctx.filter = 'none';
+
+                                                            // Phase 1: Extended News Broadcast & Cinematic Zoom (10 seconds)
+                                                            if (t < 10000) {
+                                                                ctx.save();
+                                                                // Anime Dramatic Zoom at the end of the broadcast
+                                                                if (t > 7500) {
+                                                                    const zoomProg = (t - 7500) / 2500; // 0 to 1
+                                                                    const easeZoom = Math.pow(zoomProg, 3); // Cubic ease
+                                                                    const scale = 1 + easeZoom * 3.5;
+                                                                    
+                                                                    // Focus on PiP launchpad
+                                                                    const targetX = 40 + 380/2; 
+                                                                    const targetY = 60 + 280/2;
+                                                                    
+                                                                    ctx.translate(w/2, h/2);
+                                                                    ctx.scale(scale, scale);
+                                                                    // Add intense camera shake during zoom
+                                                                    ctx.translate(-targetX + (Math.random()-0.5)*easeZoom*15, -targetY + (Math.random()-0.5)*easeZoom*15);
+                                                                }
+                                                                
+                                                                drawNews(ctx, w, h, t);
+
+                                                                // Add red flashing vignette during zoom
+                                                                if (t > 7500) {
+                                                                    const zoomProg = (t - 7500) / 2500;
+                                                                    ctx.fillStyle = `rgba(255, 0, 0, ${Math.pow(zoomProg, 2) * 0.4})`;
+                                                                    ctx.fillRect(0, 0, w, h);
+                                                                }
+                                                                ctx.restore();
+
+                                                                // Overlay Anime Warning Text
+                                                                if (t > 8500) {
+                                                                    ctx.fillStyle = 'red';
+                                                                    ctx.font = '900 140px "Impact", sans-serif';
+                                                                    ctx.textAlign = 'center';
+                                                                    ctx.textBaseline = 'middle';
+                                                                    ctx.shadowBlur = 30; ctx.shadowColor = '#000';
+                                                                    ctx.fillText("警告", w/2, h/2 - 60); // Japanese for WARNING
+                                                                    ctx.fillStyle = 'white';
+                                                                    ctx.font = '900 40px "Impact", sans-serif';
+                                                                    ctx.letterSpacing = '5px';
+                                                                    ctx.fillText("TARGET LOCKED: LUNA", w/2, h/2 + 60);
+                                                                    ctx.shadowBlur = 0;
+                                                                    ctx.letterSpacing = '0px';
+                                                                }
+                                                            } 
+                                                            // Phase 2 & 3: Anime Space Flight and Impact (10s to 25s)
+                                                            else if (t < 25000) {
+                                                                const st = t - 10000; // space time mapping
+                                                                
+                                                                if (!spaceAudioPlayed) {
+                                                                    spaceAudioPlayed = true;
+                                                                    try {
+                                                                        const actx = new (window.AudioContext || window.webkitAudioContext)();
+                                                                        const osc = actx.createOscillator(); const gain = actx.createGain();
+                                                                        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(400, actx.currentTime); osc.frequency.exponentialRampToValueAtTime(800, actx.currentTime + 8.0);
+                                                                        gain.gain.setValueAtTime(0.1, actx.currentTime); gain.gain.linearRampToValueAtTime(0.8, actx.currentTime + 8.0);
+                                                                        osc.connect(gain); gain.connect(actx.destination); osc.start(); osc.stop(actx.currentTime + 8.0);
+                                                                    } catch(e){}
+                                                                }
+
+                                                                // Impact Frames (Flashing inverted colors right at impact)
+                                                                if (st > 7950 && st < 8150) {
+                                                                    ctx.filter = (Math.floor(t/40) % 2 === 0) ? 'invert(1) contrast(2)' : 'none';
+                                                                }
+
+                                                                // Draw Starfield with intense panning
+                                                                ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+                                                                ctx.fillStyle = '#fff';
+                                                                const panX = st * 0.4; // Fast camera pan
+                                                                stars.forEach(s => { 
+                                                                    let sx = (s.x*w - panX) % w;
+                                                                    if(sx < 0) sx += w;
+                                                                    ctx.beginPath(); ctx.arc(sx, s.y*h, s.s, 0, Math.PI*2); ctx.fill(); 
+                                                                });
+                                                                
+                                                                // Earth receding
+                                                                const ex = w*0.15 - panX*0.6, ey = h*0.85, er = Math.min(w,h)*0.25;
+                                                                if(ex + er > 0) drawEarth(ctx, ex, ey, er, st);
+                                                                
+                                                                // Moon approaches (10x bigger, slowly panning left)
+                                                                const mr = Math.min(w,h)*2.5;
+                                                                const mx = w*0.85 + mr - (panX*0.3);
+                                                                const my = h*0.5;
+                                                                const impactX = mx - mr; // The surface of the moon
+                                                                const impactY = my;
+                                                                
+                                                                // ONLY DRAW MOON BEFORE IMPACT
+                                                                if (st < 8000) {
+                                                                    drawMoon(ctx, mx, my, mr);
+                                                                }
+
+                                                                // Extreme Speed Lines during flight
+                                                                if (st < 8000) {
+                                                                    drawSpeedLines(ctx, w, h, t);
+                                                                }
+                                                                
+                                                                // Phase 2: Missile Anime Flight (8 seconds)
+                                                                if (st < 8000) {
+                                                                    let beamX, beamY;
+                                                                    if (st < 1500) {
+                                                                        // Blast off from Earth into camera center
+                                                                        const pr = st / 1500;
+                                                                        beamX = ex + (w/2 - ex)*Math.pow(pr, 0.5);
+                                                                        beamY = ey + (h/2 - ey)*Math.pow(pr, 0.5);
+                                                                    } else if (st < 7000) {
+                                                                        // Intense tracking shot (holds center, violent shaking)
+                                                                        beamX = w/2 + Math.sin(t/30)*15;
+                                                                        beamY = h/2 + Math.cos(t/25)*15;
+                                                                        drawSpeedLines(ctx, w, h, t*1.5); // Add extra speed lines
+                                                                    } else {
+                                                                        // Flash step to Moon surface
+                                                                        const pr = (st - 7000) / 1000;
+                                                                        beamX = w/2 + (impactX - w/2)*Math.pow(pr, 4); // Extremely fast acceleration
+                                                                        beamY = h/2 + (impactY - h/2)*Math.pow(pr, 4);
+                                                                    }
+                                                                    drawAnimeBeam(ctx, beamX, beamY, mx, my, t);
+                                                                } 
+                                                                // Phase 3: Anime Impact (Moon shatters)
+                                                                else {
+                                                                    if (!impacted) { impacted = true; initDebris(impactX, impactY); flashAlpha = 1; }
+                                                                    
+                                                                    const domeTime = st - 8000;
+                                                                    
+                                                                    // Massive Expanding Energy Dome at the impact site
+                                                                    if (domeTime < 4000) {
+                                                                        const domeRadius = domeTime * 1.8;
+                                                                        ctx.beginPath(); ctx.arc(impactX, impactY, domeRadius, 0, Math.PI*2);
+                                                                        const domeGrad = ctx.createRadialGradient(impactX, impactY, 0, impactX, impactY, domeRadius);
+                                                                        domeGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                                                                        domeGrad.addColorStop(0.3, 'rgba(255, 50, 0, 0.9)');
+                                                                        domeGrad.addColorStop(1, 'rgba(255, 0, 0, 0)');
+                                                                        ctx.fillStyle = domeGrad;
+                                                                        ctx.globalCompositeOperation = 'screen';
+                                                                        ctx.fill();
+                                                                        ctx.globalCompositeOperation = 'source-over';
+                                                                        
+                                                                        // Shockwave Rings
+                                                                        ctx.strokeStyle = `rgba(255, 255, 255, ${Math.max(0, 1 - domeTime/2500)})`;
+                                                                        ctx.lineWidth = 20 - (domeTime/2500)*15;
+                                                                        ctx.beginPath(); ctx.ellipse(impactX, impactY, domeTime*3, domeTime*3, 0, 0, Math.PI*2); ctx.stroke();
+                                                                        ctx.lineWidth = 8;
+                                                                        ctx.beginPath(); ctx.ellipse(impactX, impactY, domeTime*3.5, domeTime*3.5, 0, 0, Math.PI*2); ctx.stroke();
+                                                                    }
+
+                                                                    // Render flaming shattering debris coming AT the camera (anime 3D effect)
+                                                                    debris.forEach(d => {
+                                                                        d.x += d.vx * (1 + domeTime/800); // accelerates massively
+                                                                        d.y += d.vy * (1 + domeTime/800); 
+                                                                        d.scale += d.scaleSpeed * 2.0; // grows huge rapidly
+                                                                        d.rot += d.rotV;
+                                                                        ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(d.rot); ctx.scale(d.scale, d.scale);
+                                                                        ctx.fillStyle = '#111'; ctx.fillRect(-d.size/2, -d.size/2, d.size, d.size);
+                                                                        // Glowing leading edge
+                                                                        ctx.fillStyle = 'rgba(255, 50, 0, 0.9)'; ctx.fillRect(-d.size/2-3, -d.size/2-3, d.size+6, 5);
+                                                                        ctx.restore();
+                                                                    });
+                                                                    
+                                                                    // Screen Whiteout Fade
+                                                                    if (flashAlpha > 0) {
+                                                                        ctx.fillStyle = `rgba(255, 255, 255, ${flashAlpha})`; ctx.fillRect(0,0,w,h);
+                                                                        flashAlpha -= 0.02;
+                                                                    }
+                                                                    
+                                                                    // Massive sustained screen shake
+                                                                    if (domeTime < 5000) {
+                                                                        const shakeStr = 60 * Math.max(0, 1 - domeTime/5000);
+                                                                        cvs.style.transform = `translate(${(Math.random()-0.5)*shakeStr}px, ${(Math.random()-0.5)*shakeStr}px)`;
+                                                                    } else {
+                                                                        cvs.style.transform = 'none';
+                                                                    }
+                                                                }
+                                                            } 
+                                                            // Phase 4: BSOD Trigger
+                                                            else {
+                                                                if(!window.bsodTriggered) {
+                                                                    window.bsodTriggered = true;
+                                                                    cvs.style.transform = 'none';
+                                                                    ctx.filter = 'none';
+                                                                    const flash = document.createElement('div');
+                                                                    flash.className = 'nuke-overlay';
+                                                                    document.body.appendChild(flash);
+                                                                    
+                                                                    const bsod = document.getElementById('fake-bsod');
+                                                                    bsod.querySelector('h2').innerText = "FATAL ERROR: LUNAR COLLISION DETECTED.";
+                                                                    bsod.querySelector('p').innerText = "Earth has been destroyed by falling debris.";
+                                                                    
+                                                                    setTimeout(() => EasterEggs.fakeBSOD(true), 1000);
+                                                                }
+                                                            }
+                                                            
+                                                            // Remove filter at the very end just in case
+                                                            if(!window.bsodTriggered) {
+                                                                requestAnimationFrame(drawLoop);
+                                                            }
+                                                        }
+                                                        
+                                                        drawLoop();
+                                                    }, 400); // Wait slightly after click before loading UI
+                                                }, 1000); // Wait on thumbnail
+                                            }, 500); // Wait before moving to thumbnail
+                                        }, 1000); // Wait for results to render
                                     }
-                                    
-                                    // Massive screen shake as debris approaches screen
-                                    if (st > 12000) {
-                                        cvs.style.transform = `translate(${(Math.random()-0.5)*40}px, ${(Math.random()-0.5)*40}px)`;
-                                    }
-                                }
-                            } 
-                            // Phase 4: BSOD Trigger
-                            else {
-                                if(!window.bsodTriggered) {
-                                    window.bsodTriggered = true;
-                                    cvs.style.transform = 'none';
-                                    const flash = document.createElement('div');
-                                    flash.className = 'nuke-overlay';
-                                    document.body.appendChild(flash);
-                                    
-                                    const bsod = document.getElementById('fake-bsod');
-                                    bsod.querySelector('h2').innerText = "FATAL ERROR: LUNAR COLLISION DETECTED.";
-                                    bsod.querySelector('p').innerText = "Earth has been destroyed by falling debris.";
-                                    
-                                    setTimeout(() => EasterEggs.fakeBSOD(true), 1000);
-                                }
-                            }
-                            if(!window.bsodTriggered) requestAnimationFrame(drawLoop);
-                        }
-                        
-                        drawLoop();
-                        return; // Exit init so standard browser logic doesn't attach
+                                }, 50); // Fast typing speed
+                            }, 1000); // Wait on input before typing
+                        }, 800); // Initial delay to move to input
+
+                        return; // Prevent normal init navigation
                     }
 
                     const navigate = async () => {
@@ -2386,6 +2740,7 @@
                                     break;
                                 case 'matrix':
                                     out.innerHTML += "Wake up, Neo...\n";
+                                    Checklist.complete('matrix');
                                     EasterEggs.startMatrix();
                                     break;
                                 case 'transform':
@@ -2433,6 +2788,7 @@
                                 
                                 // Easter Egg
                                 if(disp.value === '80085') EasterEggs.showToast("Hehe. Classic. 🤭");
+                                if(disp.value === '42') Checklist.complete('calc_42');
                             } catch(e) { disp.value = 'Error'; expr = ''; }
                         }
                         else {
@@ -2440,6 +2796,148 @@
                             disp.value = expr;
                         }
                     });
+                }
+            },
+            'taskmgr': {
+                name: 'Task Manager', icon: '📈', width: 650, height: 500,
+                render: (id) => `
+                    <div class="app-taskmgr" style="display:flex; height:100%; color:var(--text-main); background:var(--win-bg); font-family:'Segoe UI', sans-serif;">
+                        <div style="width:180px; border-right:1px solid var(--glass-border); padding:10px; display:flex; flex-direction:column; gap:5px; background:rgba(0,0,0,0.05);">
+                            <div class="tm-tab active" data-target="${id}-tab-proc" style="padding:10px; border-radius:var(--radius-md); cursor:pointer; background:var(--active-bg); transition:background 0.2s;">📑 Processes</div>
+                            <div class="tm-tab" data-target="${id}-tab-perf" style="padding:10px; border-radius:var(--radius-md); cursor:pointer; transition:background 0.2s;">📊 Performance</div>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; background:transparent;">
+                            <div id="${id}-tab-proc" class="tm-pane" style="display:flex; flex-direction:column; height:100%;">
+                                <div style="display:flex; padding:10px 15px; border-bottom:1px solid var(--glass-border); font-weight:bold; font-size:12px; color:var(--text-secondary);">
+                                    <div style="flex:2;">Name</div>
+                                    <div style="flex:1; text-align:right;">CPU</div>
+                                    <div style="flex:1; text-align:right;">Memory</div>
+                                </div>
+                                <div id="${id}-proc-list" style="flex:1; overflow-y:auto; padding:10px;"></div>
+                            </div>
+                            <div id="${id}-tab-perf" class="tm-pane" style="display:none; padding:20px; overflow-y:auto; height:100%;">
+                                <h2 style="margin-bottom:15px; font-weight:400;">Performance</h2>
+                                <div style="border:1px solid var(--glass-border); border-radius:var(--radius-md); padding:15px; margin-bottom:15px; background:var(--input-bg);">
+                                    <h4 style="color:var(--text-secondary); margin-bottom:5px;">CPU</h4>
+                                    <div style="font-size:20px; margin-bottom:10px;">Quantum Potato i13-1337K @ 9001 MHz</div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px;"><span>Utilization</span><span id="${id}-cpu-util" style="font-family:monospace;">0%</span></div>
+                                    <div style="width:100%; height:60px; border:1px solid var(--glass-border); position:relative; margin-top:5px; display:flex; align-items:flex-end;">
+                                        <svg preserveAspectRatio="none" width="100%" height="100%" id="${id}-cpu-graph" style="stroke:var(--accent); stroke-width:2; fill:rgba(0,103,192,0.2);"></svg>
+                                    </div>
+                                </div>
+                                <div style="border:1px solid var(--glass-border); border-radius:var(--radius-md); padding:15px; margin-bottom:15px; background:var(--input-bg);">
+                                    <h4 style="color:var(--text-secondary); margin-bottom:5px;">Memory</h4>
+                                    <div style="font-size:20px; margin-bottom:10px;">87 PB DDR8 (RGB Enabled)</div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px;"><span>In use</span><span id="${id}-mem-util" style="font-family:monospace;">86.9 PB</span></div>
+                                    <div style="width:100%; height:60px; border:1px solid var(--glass-border); position:relative; margin-top:5px; display:flex; align-items:flex-end;">
+                                        <svg preserveAspectRatio="none" width="100%" height="100%" id="${id}-mem-graph" style="stroke:#8e44ad; stroke-width:2; fill:rgba(142,68,173,0.2);"></svg>
+                                    </div>
+                                </div>
+                                <div style="border:1px solid var(--glass-border); border-radius:var(--radius-md); padding:15px; background:var(--input-bg);">
+                                    <h4 style="color:var(--text-secondary); margin-bottom:5px;">GPU</h4>
+                                    <div style="font-size:20px; margin-bottom:10px;">NVIDIA RTX 9090 Ti Super-Duper FE</div>
+                                    <div style="font-size:12px; color:var(--text-secondary);">Currently rendering the 14th dimension</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                init: (id) => {
+                    // Tab logic
+                    const tabs = document.querySelectorAll(`#${id} .tm-tab`);
+                    const panes = document.querySelectorAll(`#${id} .tm-pane`);
+                    
+                    tabs.forEach(tab => {
+                        tab.onclick = () => {
+                            tabs.forEach(t => { t.style.background = 'transparent'; t.classList.remove('active'); });
+                            panes.forEach(p => p.style.display = 'none');
+                            
+                            tab.style.background = 'var(--active-bg)';
+                            tab.classList.add('active');
+                            document.getElementById(tab.getAttribute('data-target')).style.display = 'flex';
+                            if(tab.getAttribute('data-target').includes('perf')) {
+                                document.getElementById(tab.getAttribute('data-target')).style.display = 'block';
+                            }
+                        };
+                        tab.onmouseover = () => { if(!tab.classList.contains('active')) tab.style.background = 'var(--hover-bg)'; };
+                        tab.onmouseout = () => { if(!tab.classList.contains('active')) tab.style.background = 'transparent'; };
+                    });
+
+                    // Process List Update Logic
+                    const procList = document.getElementById(`${id}-proc-list`);
+                    const cpuUtil = document.getElementById(`${id}-cpu-util`);
+                    const memUtil = document.getElementById(`${id}-mem-util`);
+                    
+                    const processes = [
+                        { name: "Chrome.exe (10,000 tabs)", cpu: 0, mem: 0, baseC: 15, baseM: 60 },
+                        { name: "Download_More_RAM.bat", cpu: 0, mem: 0, baseC: 35, baseM: 10 },
+                        { name: "RGB_Controller.exe", cpu: 0, mem: 0, baseC: 45, baseM: 5 },
+                        { name: "Finding_Who_Asked.exe", cpu: 0, mem: 0, baseC: 10, baseM: 8 },
+                        { name: "System32_deleter.exe", cpu: 0, mem: 0, baseC: 5, baseM: 2 },
+                        { name: "Homework_folder_protector.sys", cpu: 0, mem: 0, baseC: 2, baseM: 0.5 },
+                        { name: "Not_A_Virus_Trust_Me.exe", cpu: 0, mem: 0, baseC: 25, baseM: 15 },
+                        { name: "Doors_OS_Kernel.sys", cpu: 0, mem: 0, baseC: 1, baseM: 0.1 },
+                    ];
+
+                    let cpuHistory = Array(20).fill(0);
+                    let memHistory = Array(20).fill(0);
+                    let loopId;
+
+                    function updateTaskManager() {
+                        if (!document.getElementById(id)) return; // Stop if closed
+
+                        let totalCpu = 0;
+                        let totalMem = 0;
+                        let html = '';
+
+                        processes.forEach(p => {
+                            p.cpu = Math.max(0.1, p.baseC + (Math.random() * 12 - 6)).toFixed(1);
+                            p.mem = Math.max(0.1, p.baseM + (Math.random() * 3 - 1.5)).toFixed(1);
+                            totalCpu += parseFloat(p.cpu);
+                            totalMem += parseFloat(p.mem);
+                            
+                            html += `
+                                <div style="display:flex; padding:8px 15px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:13px;">
+                                    <div style="flex:2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
+                                    <div style="flex:1; text-align:right; font-family:monospace; color:${p.cpu > 30 ? '#ff8800' : 'inherit'};${p.cpu > 50 ? 'color:#ff3300;' : ''}">${p.cpu}%</div>
+                                    <div style="flex:1; text-align:right; font-family:monospace;">${p.mem} PB</div>
+                                </div>
+                            `;
+                        });
+                        
+                        procList.innerHTML = html;
+                        
+                        // Normalize totals
+                        let finalCpu = Math.min(100, Math.max(0, totalCpu)).toFixed(1);
+                        let finalMem = Math.min(87, Math.max(0, totalMem)).toFixed(1);
+                        cpuUtil.innerText = finalCpu + '%';
+                        memUtil.innerText = finalMem + ' PB';
+
+                        cpuHistory.push(finalCpu); cpuHistory.shift();
+                        memHistory.push(finalMem); memHistory.shift();
+
+                        // Draw Graphs
+                        const drawGraph = (history, elId, maxVal) => {
+                            const el = document.getElementById(elId);
+                            if (!el) return;
+                            const w = 100, h = 60; 
+                            let path = `M 0,${h} `;
+                            history.forEach((val, i) => {
+                                const x = (i / (history.length - 1)) * w;
+                                const y = h - ((val / maxVal) * h);
+                                path += `L ${x},${y} `;
+                            });
+                            path += `L ${w},${h} Z`;
+                            el.innerHTML = `<path d="${path}" vector-effect="non-scaling-stroke" />`;
+                        };
+
+                        drawGraph(cpuHistory, `${id}-cpu-graph`, 100);
+                        drawGraph(memHistory, `${id}-mem-graph`, 87);
+
+                        loopId = setTimeout(updateTaskManager, 1000);
+                    }
+
+                    updateTaskManager();
                 }
             },
             'snake': {
@@ -2828,6 +3326,14 @@
                 win.style.zIndex = ++WindowManager.z;
 
                 win.innerHTML = `
+                    <div class="win-resize-handle n" data-dir="n"></div>
+                    <div class="win-resize-handle s" data-dir="s"></div>
+                    <div class="win-resize-handle e" data-dir="e"></div>
+                    <div class="win-resize-handle w" data-dir="w"></div>
+                    <div class="win-resize-handle ne" data-dir="ne"></div>
+                    <div class="win-resize-handle nw" data-dir="nw"></div>
+                    <div class="win-resize-handle se" data-dir="se"></div>
+                    <div class="win-resize-handle sw" data-dir="sw"></div>
                     <div class="win-titlebar">
                         <div class="win-drag-handle">
                             <span>${app.icon}</span><span class="win-title">${app.name}</span>
@@ -2855,6 +3361,9 @@
                     startX = e.clientX; startY = e.clientY;
                     startLeft = win.offsetLeft; startTop = win.offsetTop;
                     
+                    const iframes = win.querySelectorAll('iframe');
+                    iframes.forEach(ifr => ifr.style.pointerEvents = 'none'); // Prevent iframes from swallowing mouse events
+                    
                     const mouseMove = (ev) => {
                         if (!isDragging) return;
                         let newY = startTop + (ev.clientY - startY);
@@ -2865,6 +3374,7 @@
                     const mouseUp = (ev) => {
                         isDragging = false;
                         win.classList.remove('dragging');
+                        iframes.forEach(ifr => ifr.style.pointerEvents = 'auto');
                         document.removeEventListener('mousemove', mouseMove);
                         document.removeEventListener('mouseup', mouseUp);
                         // Aero snap
@@ -2872,6 +3382,75 @@
                     };
                     document.addEventListener('mousemove', mouseMove);
                     document.addEventListener('mouseup', mouseUp);
+                });
+
+                // Window Resizing Logic
+                const handles = win.querySelectorAll('.win-resize-handle');
+                handles.forEach(handle => {
+                    handle.addEventListener('mousedown', (e) => {
+                        if (win.classList.contains('maximized')) return;
+                        e.stopPropagation(); // prevent window drag conflicts
+                        WindowManager.focus(winId);
+                        
+                        const dir = handle.dataset.dir;
+                        const startX = e.clientX;
+                        const startY = e.clientY;
+                        const startW = win.offsetWidth;
+                        const startH = win.offsetHeight;
+                        const startL = win.offsetLeft;
+                        const startT = win.offsetTop;
+                        win.classList.add('resizing');
+                        
+                        const iframes = win.querySelectorAll('iframe');
+                        iframes.forEach(ifr => ifr.style.pointerEvents = 'none');
+
+                        const doResize = (ev) => {
+                            let newW = startW, newH = startH, newL = startL, newT = startT;
+                            const minW = 250, minH = 150;
+
+                            if (dir.includes('e')) {
+                                newW = Math.max(minW, startW + (ev.clientX - startX));
+                            }
+                            if (dir.includes('w')) {
+                                const deltaX = ev.clientX - startX;
+                                if (startW - deltaX >= minW) {
+                                    newW = startW - deltaX;
+                                    newL = startL + deltaX;
+                                } else {
+                                    newW = minW;
+                                    newL = startL + startW - minW;
+                                }
+                            }
+                            if (dir.includes('s')) {
+                                newH = Math.max(minH, startH + (ev.clientY - startY));
+                            }
+                            if (dir.includes('n')) {
+                                const deltaY = ev.clientY - startY;
+                                if (startH - deltaY >= minH) {
+                                    newH = startH - deltaY;
+                                    newT = startT + deltaY;
+                                } else {
+                                    newH = minH;
+                                    newT = startT + startH - minH;
+                                }
+                            }
+
+                            win.style.width = newW + 'px';
+                            win.style.height = newH + 'px';
+                            win.style.left = newL + 'px';
+                            win.style.top = newT + 'px';
+                        };
+
+                        const stopResize = () => {
+                            win.classList.remove('resizing');
+                            iframes.forEach(ifr => ifr.style.pointerEvents = 'auto');
+                            document.removeEventListener('mousemove', doResize);
+                            document.removeEventListener('mouseup', stopResize);
+                        };
+
+                        document.addEventListener('mousemove', doResize);
+                        document.addEventListener('mouseup', stopResize);
+                    });
                 });
 
                 document.getElementById('window-container').appendChild(win);
@@ -3082,12 +3661,68 @@
                 // Render Desktop
                 System.renderDesktop();
 
-                // Desktop Context Menu and click handling
+                // Desktop Context Menu and Marquee Selection handling
                 const desktop = document.getElementById('desktop');
-                desktop.addEventListener('mousedown', () => {
+                
+                let selBox = null;
+                let startX, startY;
+
+                desktop.addEventListener('mousedown', (e) => {
+                    if (e.target !== desktop) return; // Only trigger if clicking directly on the desktop background
+                    
                     document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
                     ContextMenu.hide();
                     document.getElementById('start-menu').classList.remove('visible');
+
+                    if (selBox) selBox.remove();
+                    
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    
+                    selBox = document.createElement('div');
+                    selBox.className = 'selection-box';
+                    selBox.style.left = startX + 'px';
+                    selBox.style.top = startY + 'px';
+                    selBox.style.width = '0px';
+                    selBox.style.height = '0px';
+                    document.body.appendChild(selBox);
+
+                    const onMouseMove = (ev) => {
+                        const currentX = ev.clientX;
+                        const currentY = ev.clientY;
+                        
+                        const left = Math.min(startX, currentX);
+                        const top = Math.min(startY, currentY);
+                        const width = Math.abs(currentX - startX);
+                        const height = Math.abs(currentY - startY);
+
+                        selBox.style.left = left + 'px';
+                        selBox.style.top = top + 'px';
+                        selBox.style.width = width + 'px';
+                        selBox.style.height = height + 'px';
+
+                        const boxRect = selBox.getBoundingClientRect();
+                        document.querySelectorAll('.desktop-icon').forEach(icon => {
+                            const iconRect = icon.getBoundingClientRect();
+                            if (!(boxRect.right < iconRect.left || 
+                                  boxRect.left > iconRect.right || 
+                                  boxRect.bottom < iconRect.top || 
+                                  boxRect.top > iconRect.bottom)) {
+                                icon.classList.add('selected');
+                            } else {
+                                icon.classList.remove('selected');
+                            }
+                        });
+                    };
+
+                    const onMouseUp = () => {
+                        if (selBox) selBox.remove();
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    };
+
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
                 });
                 
                 desktop.addEventListener('contextmenu', (e) => {
@@ -3191,6 +3826,18 @@
 
                 // Initialize Weather
                 System.initWeather();
+
+                // Taskbar Context Menu for Task Manager
+                const taskbarWrapper = document.getElementById('taskbar-wrapper');
+                taskbarWrapper.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ContextMenu.show(e.clientX, e.clientY, [
+                        { label: 'Task Manager', icon: '📈', action: () => WindowManager.launch('taskmgr') },
+                        'divider',
+                        { label: 'Taskbar settings', icon: '⚙️', action: () => WindowManager.launch('settings') }
+                    ]);
+                });
             },
             initWeather: async () => {
                 const tempEl = document.getElementById('weather-temp');
@@ -3292,8 +3939,66 @@
                 sd.style.pointerEvents = 'auto';
                 
                 setTimeout(() => {
-                    window.location.reload();
+                    System.softReboot();
                 }, 4000); // Increased to 4 seconds to give time to read
+            },
+            softReboot: () => {
+                // Clear all windows & residual easter egg effects
+                document.querySelectorAll('.sys-window').forEach(w => w.remove());
+                document.querySelectorAll('.nuke-overlay').forEach(el => el.remove());
+                document.body.classList.remove('siren-active', 'transform-anim');
+                
+                // Reset taskbar
+                const tb = document.getElementById('tb-apps');
+                tb.innerHTML = '';
+                PinnedApps.forEach(appId => {
+                    if (!Apps[appId]) return;
+                    const btn = document.createElement('button');
+                    btn.className = 'tb-btn';
+                    btn.id = `tb_app_${appId}`;
+                    btn.innerHTML = Apps[appId].icon;
+                    btn.onclick = () => WindowManager.launch(appId);
+                    tb.appendChild(btn);
+                });
+
+                // Reset overlay screens
+                document.getElementById('fake-bsod').style.display = 'none';
+                document.getElementById('credits-screen').style.display = 'none';
+                document.getElementById('credits-screen').style.opacity = '0';
+                
+                const sd = document.getElementById('shutdown-screen');
+                sd.style.opacity = '0';
+                sd.style.pointerEvents = 'none';
+
+                // Reset Logon Screen
+                const logon = document.getElementById('logon-screen');
+                logon.style.display = 'flex';
+                logon.style.opacity = '1';
+                logon.style.backdropFilter = 'blur(40px) brightness(0.7)';
+                document.getElementById('logon-pwd').value = '';
+
+                // Render Desktop to reset UI states
+                System.renderDesktop();
+
+                // Trigger Boot Screen
+                const bootScreen = document.getElementById('boot-screen');
+                bootScreen.style.display = 'flex';
+                bootScreen.style.opacity = '1';
+                
+                const bootTip = document.getElementById('boot-tip');
+                if (bootTip) bootTip.innerText = System.getRandomTip();
+
+                setTimeout(() => {
+                    bootScreen.style.opacity = '0';
+                    let bootSound = new Audio('startup.mp3');
+                    bootSound.volume = 0.5;
+                    bootSound.play().catch(err => console.log("Browser prevented audio autoplay", err));
+
+                    setTimeout(() => {
+                        bootScreen.style.display = 'none';
+                        document.getElementById('logon-pwd').focus();
+                    }, 800);
+                }, 5500);
             },
             shutdown: () => {
                 document.getElementById('start-menu').classList.remove('visible');
@@ -3599,11 +4304,8 @@
                                     setTimeout(() => {
                                         cursor.style.transform = 'scale(1)';
                                         setTimeout(() => {
-                                            cursor.style.display = 'none';
-                                            // Launch browser with the cutscene override flag
+                                            // KEEP CURSOR VISIBLE, handover to browser cutscene
                                             WindowManager.launch('browser', { isNukeCutscene: true });
-                                            const win = document.querySelector('.sys-window[data-app-id="browser"]');
-                                            if(win) win.classList.add('maximized');
                                             document.body.classList.remove('siren-active');
                                         }, 300);
                                     }, 100);
@@ -3635,7 +4337,7 @@
                     if (showCreditsAfter) {
                         EasterEggs.showCredits();
                     } else {
-                        window.location.reload();
+                        System.softReboot();
                     }
                 }, 5000);
             },
@@ -3660,7 +4362,7 @@
                 
                 // Finally, Reboot System
                 setTimeout(() => {
-                    window.location.reload();
+                    System.softReboot();
                 }, 6000);
             },
             downloadRAM: () => {
@@ -3795,6 +4497,7 @@
                 konamiIndex++;
                 if(konamiIndex === konami.length) {
                     EasterEggs.showToast("Gravity Inversion Activated 🙃");
+                    Checklist.complete('konami');
                     document.body.style.transform = "rotate(180deg)";
                     konamiIndex = 0;
                 }
